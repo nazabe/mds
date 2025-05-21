@@ -1,14 +1,22 @@
+// src/main.tsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css'; // Estilos globales
 
 // Importa tus componentes de página específicos
-import App from './App.tsx'; // Tu componente de la landing page
-import BookingPage from './components/BookingPage/BookingPage.tsx'; // El componente de la página de reserva
-import LoginPage from './components/LoginPage/LoginPage.tsx'; // Tu componente de la página de login
+import App from './App.tsx';
+import BookingPage from './components/BookingPage/BookingPage.tsx';
+import LoginPage from './components/LoginPage/LoginPage.tsx';
+import AdminDashboard from './components/AdminDashboard/AdminDashboard.tsx';
+import ProfessionalManagement from './components/ProfessionalManagement/ProfessionalManagement.tsx';
+import ServiceManagement from './components/ServiceManagement/ServiceManagement.tsx';
+import AppointmentManagement from './components/AppointmentManagement/AppointmentManagement.tsx'; // Importa el componente AppointmentManagement
+import ProfessionalDashboard from './components/ProfessionalDashboard/ProfessionalDashboard.tsx';
+import MyAppointments from './components/MyAppointments/MyAppointments.tsx';
 
-// Importa el componente Layout
+// Importa los componentes de Layout y ProtectedRoute
 import Layout from './components/Layout/Layout.tsx';
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute.tsx';
 
 // Importa las herramientas de enrutamiento necesarias
 import {
@@ -17,54 +25,76 @@ import {
 } from "react-router-dom";
 
 // --- Configuración del Router con Layout y Basename ---
-// Definimos un enrutador usando createBrowserRouter
-// Incluimos la configuracion del basename directamente aqui
 const router = createBrowserRouter([
   {
-    // Esta ruta principal '/' renderiza el Layout
-    // Todas las rutas definidas en 'children' se renderizarán dentro del Outlet del Layout
     path: "/",
-    element: <Layout />, // El elemento principal es el Layout
+    element: <Layout />,
     children: [
       {
-        // La ruta index renderiza el contenido de la landing page (App)
-        index: true, // `index: true` indica que esta es la ruta por defecto para el path padre ('/')
-        element: <App />, // El contenido de la ruta principal es el componente App
+        index: true,
+        element: <App />,
       },
       {
-        // Esta ruta renderiza la página de reserva
-        path: "reservar", // El path 'reservar' se combina con el path padre '/' para formar '/reservar'
-        element: <BookingPage />, // El contenido de la ruta /reservar es el componente BookingPage
+        path: "reservar",
+        element: <BookingPage />,
       },
       {
-        // Esta ruta renderiza la página de inicio de sesión
-        path: "login", // El path 'login' se combina con el path padre '/' para formar '/login'
-        element: <LoginPage />, // El contenido de la ruta /login es el componente LoginPage
+        path: "login",
+        element: <LoginPage />,
       },
-      // Puedes añadir más rutas anidadas aquí
-      // Por ejemplo, para manejar rutas 404 (páginas no encontradas)
-      // {
-      //   path: "*", // Coincide con cualquier ruta no definida antes
-      //   element: <div>404 - Página no encontrada</div>, // O un componente NotFoundPage
-      // },
     ],
   },
-  // Opcionalmente, puedes definir rutas FUERA de este Layout si necesitas páginas
-  // que NO muestren el Header o Footer global
+  {
+    // Ruta para el dashboard de ADMINISTRADOR y sus sub-rutas, PROTEGIDA con rol 'admin'
+    path: "/admin",
+    element: <ProtectedRoute requiredRole="admin" />, // Requiere rol 'admin'
+    children: [
+      {
+        path: "dashboard",
+        element: <AdminDashboard />,
+      },
+      {
+        path: "dashboard/professionals",
+        element: <ProfessionalManagement />,
+      },
+      {
+        path: "dashboard/services",
+        element: <ServiceManagement />,
+      },
+      {
+        path: "dashboard/appointments", // Ruta para la gestión de turnos
+        element: <AppointmentManagement />, // Asocia el componente AppointmentManagement
+      },
+    ],
+  },
+  {
+    // Ruta para el dashboard de PROFESIONAL y sus sub-rutas, PROTEGIDA con rol 'professional'
+    path: "/professional",
+    element: <ProtectedRoute requiredRole="professional" />, // Requiere rol 'professional'
+    children: [
+      {
+        path: "dashboard",
+        element: <ProfessionalDashboard />,
+      },
+      {
+        path: "dashboard/my-appointments",
+        element: <MyAppointments />,
+      },
+    ],
+  },
+  {
+    path: "*",
+    element: <div>404 - Página no encontrada</div>,
+  },
 ], {
-  // Configuración del Basename: Reemplaza "/mds/" con la ruta base real si es diferente
-  basename: "/mds/", // <-- Especifica la ruta base de la aplicacion
+  basename: "/mds/",
 });
 // --- Fin Configuración del Router ---
 
 
 // --- Renderizado de la Aplicación ---
-// createRoot es la nueva forma de renderizar en React 18+
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode> {/* StrictMode ayuda a detectar problemas potenciales */}
-     {/* RouterProvider provee el enrutador a toda la aplicación */}
-    {/* Usa el router con basename configurado */}
+  <React.StrictMode>
     <RouterProvider router={router} />
   </React.StrictMode>,
 );
-// --- Fin Renderizado ---

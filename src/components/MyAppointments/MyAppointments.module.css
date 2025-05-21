@@ -1,0 +1,130 @@
+/* src/components/MyAppointments/MyAppointments.module.css */
+.myAppointmentsContainer {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #333;
+}
+
+.title {
+    font-size: 2.2rem;
+    color: #1a2a4d;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: #555;
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.noAppointmentsMessage {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #777;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+    margin-top: 30px;
+}
+
+.appointmentsList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.appointmentItem {
+    background-color: #fefefe;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.appointmentHeader {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 10px;
+}
+
+.itemIcon {
+    font-size: 1.8rem;
+    color: #e91e63; /* Color rosa de marca */
+}
+
+.itemTitle {
+    font-size: 1.4rem;
+    color: #1a2a4d;
+    margin: 0;
+}
+
+.appointmentDetails p {
+    margin: 5px 0;
+    font-size: 1rem;
+    color: #555;
+}
+
+.appointmentDetails strong {
+    color: #1a2a4d;
+    display: inline-flex; /* Para alinear el ícono con el texto fuerte */
+    align-items: center;
+    gap: 5px;
+}
+
+.clientContact {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px dashed #eee;
+    font-size: 0.95rem;
+    color: #777;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .myAppointmentsContainer {
+        padding: 20px;
+        margin: 20px auto;
+    }
+
+    .title {
+        font-size: 1.8rem;
+    }
+
+    .subtitle {
+        font-size: 1rem;
+        margin-bottom: 20px;
+    }
+
+    .itemTitle {
+        font-size: 1.2rem;
+    }
+
+    .itemIcon {
+        font-size: 1.5rem;
+    }
+
+    .appointmentItem {
+        padding: 15px;
+    }
+
+    .appointmentDetails p {
+        font-size: 0.95rem;
+    }
+}
