@@ -1,0 +1,699 @@
+/* ===================== General / Layout Base ===================== */
+/* Resets y estilos base para body, html, #root, etc. */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #ffffff; /* Fondo blanco por defecto */
+  color: #333333; /* Color de texto oscuro por defecto */
+  box-sizing: border-box; /* Incluye padding y border en el tamaño del elemento */
+}
+
+*::before,
+*::after {
+  box-sizing: inherit; /* Los pseudo-elementos heredan el box-sizing */
+}
+
+#root { /* Contenedor principal donde React monta la app */
+  min-height: 100vh; /* Ocupa al menos toda la altura de la ventana */
+  display: flex;
+  flex-direction: column; /* Permite que los hijos se apilen verticalmente */
+}
+
+/* Contenedor principal de la aplicación */
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden; /* Previene scroll horizontal */
+}
+
+/* ===================== Top Bar ===================== */
+/* Barra superior con info de contacto rápido y redes sociales */
+.topBar {
+  background-color: #e91e63; /* Color rosa de marca */
+  color: white;
+  padding: 8px 5%; /* Padding vertical y horizontal */
+  display: flex;
+  justify-content: space-between; /* Espacio entre los elementos izquierdo y derecho */
+  align-items: center; /* Centra verticalmente los elementos */
+  font-size: 0.9rem;
+}
+
+.topBarLeft,
+.topBarRight {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* Espacio entre ítems */
+}
+
+.topBarItem {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Espacio entre ícono y texto */
+}
+
+.topBarSocialIcons {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Espacio entre íconos sociales */
+}
+
+.topBarSocialIcons svg {
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+/* ===================== Header / Navbar ===================== */
+/* Encabezado con logo, navegación y botones de acción */
+.header {
+  background-color: white;
+  padding: 15px 5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Sombra sutil */
+  flex-wrap: wrap; /* Permite que los elementos se envuelvan en pantallas pequeñas */
+}
+
+.logo {
+  height: 45px; /* Altura del logo */
+  width: auto;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 30px; /* Espacio entre enlaces de navegación */
+  flex-wrap: wrap; /* Permite que los enlaces se envuelvan */
+}
+
+.navLink {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s ease-in-out;
+}
+
+.navLink:hover {
+  color: #e91e63; /* Color rosa al pasar el mouse */
+}
+
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.actionButton {
+  background-color: #e91e63;
+  color: white;
+  border: none;
+  border-radius: 50%; /* Circular */
+  width: 35px;
+  height: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.actionButton:hover {
+  background-color: #d81b60; /* Rosa más oscuro al pasar el mouse */
+}
+
+/* ===================== Hero Section ===================== */
+/* Sección principal con fondo de imagen */
+.hero {
+  min-height: 85vh; /* Altura mínima */
+  background-image: url('./background-makeup.png'); /* Ruta a tu imagen de fondo */
+  background-size: cover;
+  background-position: center right; /* Posiciona la imagen */
+  display: flex;
+  align-items: center; /* Centra verticalmente el contenido */
+  padding: 60px 5%;
+  position: relative;
+  background-color: #fdf8f5; /* Fondo de respaldo/fallback */
+}
+
+.scrollArrowsWrapper {
+  display: flex; /* Usa flexbox para alinear las dos flechas en una fila */
+  justify-content: center; /* Centra los botones horizontalmente dentro de este contenedor */
+  align-items: center; /* Centra verticalmente (si los botones tuvieran diferente altura) */
+  gap: 1rem; /* Espacio entre los botones de flecha (ajusta a gusto) */
+  margin-top: 10px; /* Espacio arriba de los botones (opcional) */
+  /* Si quieres que este wrapper ocupe todo el ancho para asegurar el centrado: */
+  width: 100%;
+  /* Mantén otros estilos existentes para .scrollArrowsWrapper si los tienes */
+}
+
+.serviceImage {
+  width: 100%;           /* Que se adapte al ancho del contenedor */
+  height: 200px;         /* Altura fija para todas */
+  object-fit: cover;     /* Recorta la imagen para llenar el espacio sin deformarla */
+  border-radius: 8px;    /* Opcional: esquinas redondeadas */
+}
+
+
+/* Opcional: Capa semitransparente sobre la imagen si el texto no se lee bien */
+/* .hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(255, 255, 255, 0.3); // Ejemplo: capa blanca con 30% opacidad
+} */
+
+.heroContent {
+  max-width: 550px; /* Ancho máximo del texto */
+  position: relative; /* Asegura que esté sobre el pseudo-elemento ::before */
+  z-index: 1;
+  color: #1a2a4d; /* Color de texto oscuro */
+}
+
+.heroSubheading {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.heroHeading {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #1a2a4d;
+  margin-top: 0;
+  margin-bottom: 15px;
+  line-height: 1.2;
+}
+
+.heroDescription {
+  font-size: 1.1rem;
+  color: #444;
+  margin-bottom: 30px;
+}
+
+.heroCtaButton {
+  background-color: #e91e63;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.heroCtaButton:hover {
+  background-color: #d81b60;
+  color: #d44e7f;
+}
+
+
+/* ===================== Estilos Generales para Secciones (Sobre Nosotros, Servicios, etc.) ===================== */
+
+/* Contenedor para centrar y dar padding horizontal al contenido dentro de las secciones */
+.sectionContent {
+  max-width: 1200px; /* Ancho máximo */
+  margin: 0 auto; /* Centra el bloque */
+  padding: 0 20px; /* Padding horizontal */
+}
+
+/* Estilos para el título principal de cada sección */
+.sectionHeading {
+  font-size: 2.5rem;
+  color: #1a2a4d;
+  text-align: center;
+  margin-bottom: 30px;
+  margin-top: 0;
+}
+
+/* Estilos para los párrafos de texto general dentro de las secciones */
+.sectionText {
+  font-size: 1.15rem; /* Ajustado a 1.15rem como pediste */
+  line-height: 1.7; /* Ajustado a 1.7 para mejor lectura */
+  margin-bottom: 20px; /* Más espacio entre párrafos */
+  color: #444; /* Color de texto */
+}
+
+/* ===================== Sección: Sobre Nosotros (Estilos Específicos) ===================== */
+
+.aboutUsSection {
+  padding: 60px 0; /* Padding vertical */
+  /* Fondo ligeramente más notable como pediste */
+  background-color: #fdebf2; /* Un rosa/lila pastel suave */
+  color: #333; /* Color de texto por defecto */
+}
+
+/* Contenedor para las dos columnas (texto y contacto/mapa) */
+.aboutUsContentColumns {
+    display: grid; /* Usamos Grid para el layout de columnas */
+    /* Por defecto, en pantallas pequeñas, los elementos se apilarán (una columna) */
+    gap: 40px; /* Espacio (canal) entre las columnas */
+}
+
+/* Layout de dos columnas para pantallas medianas/grandes */
+@media (min-width: 768px) {
+    .aboutUsContentColumns {
+        grid-template-columns: 1fr 1fr; /* Dos columnas de igual ancho */
+        /* grid-template-columns: 1.2fr 0.8fr; /* O quizás la columna izquierda un poco más ancha */
+        align-items: start; /* Alinea los elementos al inicio de sus respectivas celdas */
+    }
+}
+
+/* Estilos para la columna izquierda (texto principal) */
+.aboutUsLeftColumn {
+    /* No necesita estilos especiales si usas gap en el grid contenedor */
+}
+
+/* Estilos para la columna derecha (contacto, mapa, botón) */
+.aboutUsRightColumn {
+    display: flex; /* Usa flexbox para apilar y espaciar los elementos dentro */
+    flex-direction: column;
+    gap: 20px; /* Espacio vertical entre ContactInfoBlock, MapContainer y OpenInMapsButton */
+}
+
+
+/* ====== Estilos para el Bloque de Contacto y Ubicación Resaltado ====== */
+/* El "cuadrito" que contiene el teléfono y la dirección */
+.contactInfoBlock {
+    margin-top: 0; /* Quitamos margen superior si está dentro de la columna */
+    margin-bottom: 0; /* Quitamos margen inferior */
+    padding: 20px;
+    /* Color de fondo más amigable como pediste */
+    background-color: #ffe0e6; /* Ejemplo: un rosa pastel muy claro */
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Espacio entre los ítems de contacto */
+    /* box-shadow: none; /* Opcional: quita la sombra si quieres un look más plano */
+}
+
+/* Cada ítem individual (teléfono o ubicación) */
+.contactItem {
+    display: flex; /* Usa flexbox para alinear el ícono y el texto */
+    align-items: center; /* Centra verticalmente ícono y texto */
+    gap: 15px; /* Espacio entre el ícono y el texto (si no usas contenedor de ícono) */
+    /* Si usas contactIconContainer, quita este gap y usa margin-right en contactIconContainer */
+
+    /* Opcional: separación visual entre ítems */
+    /* border-bottom: 1px solid #ffcdd2; /* Borde suave inferior */
+    /* padding-bottom: 15px; /* Espacio debajo del borde/contenido */
+    /* margin-bottom: 5px; */
+}
+/* Asegura que el último ítem no tenga borde ni padding inferior */
+.contactItem:last-child {
+   border-bottom: none;
+   padding-bottom: 0;
+   margin-bottom: 0;
+}
+
+
+/* Contenedor para el ícono (para controlarlo de forma independiente del texto) */
+/* Este estilo funciona junto con el div.contactIconContainer en App.tsx */
+.contactIconContainer {
+    width: 40px; /* Tamaño del círculo */
+    height: 40px; /* Tamaño del círculo */
+    background-color: #ffcdd2; /* Color de fondo del círculo (rosa pastel) */
+    border-radius: 50%; /* Forma redonda */
+    display: flex; /* Centra el ícono dentro del círculo */
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0; /* Evita que el contenedor del ícono se achique */
+    margin-right: 15px; /* Espacio entre el círculo del ícono y el texto */
+}
+
+/* El ícono dentro de su contenedor */
+.contactIcon {
+    font-size: 1.4rem; /* Tamaño del ícono */
+    color: #e91e63; /* Color del ícono (rosa de marca) */
+}
+
+/* El texto del contacto o ubicación */
+.contactText {
+    font-size: 1.1rem; /* Tamaño de fuente para el texto de contacto/ubicación */
+    font-weight: normal; /* Grosor normal */
+    margin: 0; /* Quita margen por defecto */
+    color: #1a2a4d; /* Color de texto oscuro */
+    flex-grow: 1; /* Permite que el texto ocupe el espacio restante */
+}
+
+/* Estilos para los enlaces dentro del texto de contacto (teléfono, WhatsApp, Ver en Mapa) */
+.contactText a {
+    color: #e91e63; /* Color rosa de marca para enlaces */
+    text-decoration: none; /* Quita el subrayado por defecto */
+    transition: color 0.2s ease-in-out;
+}
+
+.contactText a:hover {
+    color: #d81b60; /* Rosa más oscuro al pasar el mouse */
+    text-decoration: underline; /* Subrayado al pasar el mouse */
+}
+
+
+/* ====== Estilos para la Lista de Preguntas (Viñetas) ====== */
+/* La lista <ul> que contiene las preguntas */
+.questionsList {
+    list-style: disc; /* Viñetas redondas por defecto */
+    margin: 0 0 20px 20px; /* Margen: arriba, derecha, abajo (más espacio), izquierda (para indentación) */
+    padding: 0; /* Quita padding por defecto si lo hay */
+    color: #e91e63; /* Color de las viñetas (opcional, si quieres que el texto sea otro color) */
+}
+
+/* Cada elemento de la lista <li> */
+.questionsList li {
+    margin-bottom: 10px; /* Espacio entre ítems de la lista */
+    font-size: 1.15rem; /* Tamaño de fuente igual al texto principal */
+    line-height: 1.6;
+    color: #444; /* Color del texto del ítem (si es diferente al de la viñeta) */
+}
+
+
+/* ====== Estilos para el Contenedor del Mapa (iFrame) ====== */
+/* El div que envuelve el iframe */
+.mapContainer {
+    margin-top: 0; /* Ya hay gap en aboutUsRightColumn */
+    margin-bottom: 0; /* Ya hay gap */
+    border-radius: 8px;
+    overflow: hidden; /* Esconde cualquier contenido que se salga de los bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra */
+    width: 100%; /* Ocupa todo el ancho de su contenedor */
+    height: 400px; /* Altura definida para el mapa */
+}
+
+/* El iframe del mapa dentro de su contenedor */
+.mapContainer iframe {
+    width: 100%; /* Ocupa 100% del ancho del contenedor */
+    height: 100%; /* Ocupa 100% de la altura del contenedor */
+    border: 0; /* Asegura que no tenga borde */
+}
+
+
+/* ====== Estilos para el Botón "Abrir en Maps" ====== */
+/* El enlace <a> con estilo de botón */
+.openInMapsButton {
+    display: inline-flex; /* Alinea texto e ícono */
+    align-items: center;
+    gap: 10px;
+    background-color: #e91e63; /* Color de marca */
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none; /* Quita subrayado */
+    transition: background-color 0.2s ease-in-out;
+    /* align-self: flex-start; /* Alinea a la izquierda en la columna derecha */
+}
+
+.openInMapsButton:hover {
+    background-color: #d81b60; /* Color al pasar el mouse */
+}
+
+
+/* ===================== Estilos Responsive (Media Queries) ===================== */
+
+/* Ajustes para pantallas pequeñas (hasta 767px de ancho) */
+@media (max-width: 767px) {
+
+  /* Ajustes generales de padding */
+  .topBar, .header, .hero {
+    padding-left: 3%;
+    padding-right: 3%;
+  }
+   .sectionContent {
+     padding-left: 15px;
+     padding-right: 15px;
+   }
+
+
+  /* Oculta elementos en la barra superior y header para ahorrar espacio */
+  .topBarLeft .topBarItem span,
+  .topBarRight span,
+  .nav {
+     display: none;
+  }
+
+  /* Ajustes en la sección Hero */
+  .hero {
+    background-position: center center; /* Centra la imagen en mobile */
+    text-align: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+  .heroContent {
+    max-width: 100%; /* Ocupa todo el ancho */
+  }
+  .heroHeading {
+    font-size: 2.2rem;
+  }
+  .heroDescription {
+    font-size: 1rem;
+  }
+  .heroCtaButton {
+    padding: 12px 25px;
+    font-size: 1rem;
+  }
+
+
+  /* Ajustes para la estructura de columnas en mobile: se apilan */
+  .aboutUsContentColumns {
+      display: flex; /* Usamos flexbox para control */
+      flex-direction: column; /* Apila elementos verticalmente */
+      gap: 30px; /* Espacio entre la columna izq y der apiladas */
+  }
+
+  .aboutUsRightColumn {
+      gap: 20px; /* Espacio entre los elementos dentro de la columna derecha (contacto, mapa, botón) */
+  }
+
+  /* Ajustes del texto principal en mobile */
+  .sectionText {
+      font-size: 1rem; /* Reduce tamaño en mobile */
+      line-height: 1.5;
+      margin-bottom: 15px;
+  }
+
+  .sectionHeading {
+      font-size: 2rem; /* Reduce tamaño título sección */
+      margin-bottom: 20px;
+  }
+
+
+  /* Ajustes del bloque de contacto/ubicación en mobile */
+  .contactInfoBlock {
+      padding: 15px;
+      gap: 15px; /* Espacio entre ítems de contacto */
+  }
+
+  .contactItem {
+      gap: 10px; /* Espacio entre ícono y texto del ítem */
+  }
+
+  .contactIconContainer {
+      width: 35px; /* Tamaño ícono en mobile */
+      height: 35px;
+      margin-right: 10px; /* Espacio a la derecha del ícono */
+  }
+  .contactIcon {
+      font-size: 1.2rem; /* Tamaño ícono en mobile */
+  }
+
+  .contactText {
+      font-size: 1rem; /* Tamaño texto contacto */
+  }
+
+  /* Ajustes del mapa en mobile */
+  .mapContainer {
+      height: 300px; /* Altura del mapa en mobile */
+  }
+
+  /* Ajustes de la lista de preguntas en mobile */
+   .questionsList {
+       margin-left: 15px; /* Indentación en mobile */
+       margin-bottom: 15px;
+   }
+
+  .questionsList li {
+      font-size: 1rem; /* Tamaño texto lista en mobile */
+      margin-bottom: 8px;
+  }
+
+   /* Ajustes del botón "Abrir en Maps" en mobile */
+  .openInMapsButton {
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      gap: 8px;
+      /* align-self: center; /* Opcional: centrar el botón en mobile */
+  }
+
+}
+
+/* ... (Mantén todos tus estilos anteriores) ... */
+
+/* ====== Estilos Generales para Secciones ====== */
+/* ... (Mantén sectionContent, sectionHeading, sectionText) ... */
+
+
+/* ====== Sección: Sobre Nosotros (Estilos Específicos) ====== */
+/* ... (Mantén aboutUsSection, aboutUsContentColumns, aboutUsLeftColumn, aboutUsRightColumn) ... */
+/* ... (Mantén contactInfoBlock, contactItem, contactIconContainer, contactIcon, contactText y sus enlaces) ... */
+/* ... (Mantén questionsList, questionsList li) ... */
+/* ... (Mantén mapContainer, mapContainer iframe) ... */
+/* ... (Mantén openInMapsButton) ... */
+
+
+/* ===================== Sección: Nuestros Servicios (Estilos Específicos) ===================== */
+
+
+.servicesSection {
+  padding: 60px 0; /* Padding vertical */
+  background-color: #ffffff; /* Fondo blanco */
+  color: #333;
+  border-top: 1px solid #eee; /* Línea separadora superior */
+}
+
+/* Contenedor que habilita el scroll horizontal */
+.servicesScrollContainer {
+    display: flex; /* Usamos flexbox para alinear los ítems en una fila */
+    overflow-x: auto; /* Habilita el scroll horizontal si el contenido desborda */
+    -webkit-overflow-scrolling: touch; /* Mejora el scroll en dispositivos táctiles iOS */
+    padding-bottom: 20px; /* Espacio inferior para que la barra de scroll no oculte contenido */
+    margin-left: -20px; /* Compensa el padding del sectionContent para que el scroll empiece bien */
+    margin-right: -20px; /* Compensa el padding del sectionContent */
+    padding-left: 20px; /* Padding al inicio del scroll */
+    padding-right: 20px; /* Padding al final del scroll */
+    gap: 20px; /* Espacio entre las tarjetas de servicio */
+
+    /* Opcional: Estilos para ocultar la barra de scroll por defecto */
+    scrollbar-width: none;  /* Para Firefox */
+    -ms-overflow-style: none;  /* Para Internet Explorer 10+ */
+}
+
+/* Opcional: Regla para ocultar la barra de scroll en navegadores basados en WebKit (Chrome, Safari) */
+.servicesScrollContainer::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* Estilos para cada tarjeta individual de servicio */
+.serviceCard {
+    flex-shrink: 0; /* Evita que las tarjetas se achiquen */
+    width: 250px; /* Ancho fijo para cada tarjeta (ajusta según necesites) */
+    /* Puedes usar min-width si prefieres que se achiquen un poco */
+    /* min-width: 200px; */
+    background-color: #fff5f7; /* Color de fondo suave para la tarjeta */
+    border-radius: 8px; /* Bordes redondeados */
+    overflow: hidden; /* Asegura que la imagen y contenido se ajusten a los bordes redondeados */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    display: flex;
+    flex-direction: column;
+    /* padding-bottom: 15px; /* Padding interno en la parte de abajo */
+}
+
+/* Placeholder para la imagen del servicio (tendrá dimensiones para que se vea el espacio) */
+.serviceImagePlaceholder {
+    width: 100%; /* Ocupa todo el ancho de la tarjeta */
+    height: 150px; /* Altura fija para el espacio de la imagen (ajusta según necesites) */
+    background-color: #eee; /* Un color gris claro como placeholder */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #555;
+    /* Si usas img, la regla sería .serviceCard img */
+    /* .serviceCard img { width: 100%; height: 100%; object-fit: cover; } */
+}
+
+/* Estilos para el título del servicio dentro de la tarjeta */
+.serviceTitle {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1a2a4d;
+    margin: 15px 10px 10px 10px; /* Espacio alrededor del título */
+    text-align: center; /* Centra el título */
+}
+
+/* Estilos para la descripción del servicio si decides añadirla */
+/* .serviceDescription {
+    font-size: 0.9rem;
+    color: #555;
+    margin: 0 10px 15px 10px;
+    text-align: center;
+} */
+
+
+/* ===================== Estilos Responsive (Media Queries) ===================== */
+
+/* Ajustes para pantallas pequeñas (hasta 767px de ancho) */
+@media (max-width: 767px) {
+  /* ... (Mantén tus estilos responsive existentes para elementos generales, top bar, header, hero, about us, etc.) ... */
+
+  /* Ajustes para la sección de Servicios en mobile */
+  .servicesSection {
+      padding-top: 40px;
+      padding-bottom: 40px;
+  }
+
+  /* Ajustes para el scroll container en mobile */
+  .servicesScrollContainer {
+      /* Mantén overflow-x: auto; */
+      /* Ajusta los márgenes y padding para que el scroll funcione bien */
+      margin-left: -15px; /* Si tu sectionContent tiene 15px de padding */
+      margin-right: -15px;
+      padding-left: 15px;
+      padding-right: 15px;
+      gap: 15px; /* Espacio entre tarjetas en mobile */
+  }
+
+  /* Ajustes para las tarjetas individuales en mobile */
+  .serviceCard {
+      width: 200px; /* Ancho más pequeño en mobile */
+      /* O podrías usar un porcentaje o vw si prefieres */
+      /* width: 70vw; /* Ejemplo: 70% del ancho de la ventana */
+  }
+
+   .serviceImagePlaceholder {
+       height: 120px; /* Altura más pequeña para la imagen en mobile */
+   }
+
+  .serviceTitle {
+      font-size: 1.1rem;
+      margin: 10px 5px 8px 5px;
+  }
+
+   /* .serviceDescription {
+       font-size: 0.8rem;
+       margin: 0 5px 10px 5px;
+   } */
+
+}
+/* Puedes añadir más media queries para otros breakpoints si es necesario */
+
+/* Puedes añadir más media queries para otros tamaños de pantalla si lo necesitas */
+/* @media (min-width: 768px) and (max-width: 1024px) { ... } */
+/* @media (min-width: 1025px) { ... } */
+
+
+/* Las reglas originales comentadas de .card, .logo animation, etc.,
+   probablemente venían de la plantilla inicial de Vite.
+   Como no las estás usando en App.tsx, las dejamos comentadas o podrías borrarlas.
+*/
+/* #root { ... } */
+/* .logo { ... } */
+/* @keyframes logo-spin { ... } */
+/* @media (prefers-reduced-motion: no-preference) { ... } */
+/* .card { ... } */
+/* .read-the-docs { ... } */

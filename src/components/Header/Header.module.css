@@ -1,0 +1,125 @@
+/* Estilos para el contenedor principal del Header (la barra completa) */
+.header {
+  background-color: white; /* Fondo blanco como en tu App.css */
+  padding: 15px 5%; /* Padding similar al de tu header actual */
+  display: flex;
+  justify-content: space-between; /* Separa el logo/título (izquierda) y la navegación (derecha) */
+  align-items: center; /* Centra verticalmente los elementos (logo, nav) */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Sombra sutil como en tu header actual */
+  flex-wrap: wrap; /* Permite que los elementos (logo y nav) se envuelvan en pantallas pequeñas */
+  position: sticky; /* Hace que el header se quede fijo en la parte superior al hacer scroll */
+  top: 0; /* Se pega al borde superior */
+  z-index: 1000; /* Asegura que esté por encima de otros contenidos de la página */
+   /* Usamos la misma pila de fuentes que en tu App.css y Footer.module.css */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Contenedor del Logo/Título. También es un enlace a la página de inicio. */
+.logoContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Espacio entre el ícono y el texto */
+  text-decoration: none; /* Quita el subrayado del enlace */
+  color: #1a2a4d; /* Color oscuro principal de tu marca para el texto del título */
+  font-size: 1.3rem; /* Tamaño de fuente para el título del sitio */
+  font-weight: 700; /* Negrita para el título */
+  /* Puedes añadir un hover si quieres */
+  /* &:hover { color: #e91e63; } */
+}
+
+/* Ícono que acompaña al título del sitio (ej: corazón, hoja) */
+.logoIcon {
+  font-size: 1.6rem; /* Tamaño del ícono */
+   color: #e91e63; /* Color rosa principal de tu marca para el ícono */
+   flex-shrink: 0; /* Evita que el ícono se achique si hay poco espacio */
+}
+
+/* El texto del título del sitio (Spa 'Sentirse Bien'). Ya estilizado por .logoContainer. */
+.siteTitle {
+  /* Ya estilizado por .logoContainer */
+}
+
+
+/* Estilos para el contenedor de los enlaces de navegación */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 25px; /* Espacio entre los enlaces de navegación */
+  flex-wrap: wrap; /* Permite que los enlaces se envuelvan */
+}
+
+/* Estilos para los enlaces de navegación individuales (componentes Link) */
+.navLink {
+  text-decoration: none; /* Quita el subrayado por defecto */
+  /* === CAMBIO AQUÍ === */
+  /* Usamos un color más similar al texto de detalle del footer (#555) */
+  color: #555; /* Color de texto gris medio para los enlaces */
+  /* === FIN CAMBIO === */
+  font-weight: 500; /* Grosor medio */
+  display: flex; /* Usa flexbox para alinear ícono y texto */
+  align-items: center; /* Centra verticalmente ícono y texto */
+  gap: 5px; /* Espacio entre el ícono y el texto del enlace */
+  transition: color 0.2s ease-in-out; /* Transición suave para el color */
+}
+
+/* Estilo al pasar el mouse por encima de los enlaces de navegación */
+.navLink:hover {
+  color: #e91e63; /* Color rosa principal de tu marca al pasar el mouse */
+}
+
+/* Estilos para los íconos dentro de los enlaces de navegación */
+.navIcon {
+  font-size: 1rem; /* Tamaño del ícono */
+  color: #1a2a4d; /* Color oscuro principal de tu marca para los íconos */
+}
+
+/* Opcional: Estilos específicos para el enlace "Iniciar Sesión" si quieres que parezca un botón */
+/* Basado en el estilo del botón principal de tu landing (Hero) */
+/* Puedes descomentar y ajustar si quieres que Iniciar Sesión sea un botón destacado */
+/*
+.navLink[to="/login"] {
+    background-color: #e91e63; // Fondo rosa principal
+    color: white; // Texto blanco
+    padding: 8px 15px; // Padding para darle forma de botón
+    border-radius: 5px; // Bordes redondeados
+    gap: 8px; // Espacio entre ícono y texto
+     .navIcon { color: white; } // Asegura que el ícono sea blanco dentro del botón
+     &:hover {
+         background-color: #d81b60; // Rosa más oscuro al pasar el mouse
+         color: white; // Mantiene el texto blanco en hover
+     }
+}
+*/
+
+
+/* ===================== Estilos Responsive para el Header ===================== */
+
+@media (max-width: 767px) {
+  .header {
+    padding: 10px 3%; /* Reduce padding en pantallas pequeñas */
+    flex-direction: column; /* Apila el logo/título y la navegación verticalmente */
+     gap: 15px; /* Espacio entre los elementos apilados */
+  }
+
+  .logoContainer {
+     font-size: 1.2rem; /* Reduce tamaño del título del sitio en mobile */
+  }
+
+  .logoIcon {
+     font-size: 1.5rem; /* Reduce tamaño del ícono del logo en mobile */
+  }
+
+  .nav {
+     width: 100%; /* La navegación ocupa todo el ancho disponible */
+     justify-content: center; /* Centra los enlaces de navegación */
+     gap: 15px; /* Reduce el espacio entre los enlaces */
+  }
+
+  /* Si Iniciar Sesión es un botón, puedes ajustar su tamaño/padding aquí en mobile */
+   /*
+   .navLink[to="/login"] {
+       padding: 6px 12px;
+       font-size: 0.9rem;
+   }
+   */
+}

@@ -1,0 +1,205 @@
+/* Estilos para el contenedor principal del footer */
+.footer {
+    /* Usamos un color de fondo que encaje con tu paleta, quizás un tono pastel o un gris suave */
+    background-color: #fdebf2; /* Un rosa pastel suave, similar al de la sección About Us */
+    color: #1a2a4d; /* Color de texto oscuro principal para los títulos y texto general */
+    padding: 40px 5%; /* Padding vertical y horizontal */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* Misma fuente que el resto del sitio */
+    margin-top: auto; /* Esto es crucial en el Layout para que el footer se pegue abajo */
+    flex-shrink: 0; /* Evita que el footer se achique si el contenido es largo */
+  }
+  
+  /* Contenedor interno para centrar el contenido del footer */
+  .footerContent {
+    max-width: 1200px; /* Ancho máximo, similar a sectionContent */
+    margin: 0 auto; /* Centra el contenido */
+    padding: 0 20px; /* Padding horizontal interno */
+  }
+  
+  /* Contenedor para las columnas (Contacto, Horarios, Síguenos) */
+  .footerColumns {
+    display: grid; /* Usamos Grid para organizar las columnas */
+    /* En pantallas grandes, 3 columnas de tamaño flexible */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Columnas adaptables, mínimo 200px */
+    gap: 30px; /* Espacio entre las columnas */
+    margin-bottom: 30px; /* Espacio entre las columnas y la sección de copyright */
+  }
+  
+  /* Estilos para cada columna individual del footer */
+  .footerColumn {
+    /* No necesita estilos especiales si el gap está en .footerColumns */
+  }
+  
+  /* Estilos para los títulos de cada columna (Contacto, Horarios, Síguenos) */
+  .columnTitle {
+    font-size: 1.2rem;
+    font-weight: 700; /* Más negrita para los títulos */
+    color: #1a2a4d; /* Color oscuro principal */
+    margin-top: 0;
+    margin-bottom: 20px; /* Espacio debajo del título */
+  }
+  
+  
+  /* Estilos para los ítems de Contacto */
+  .contactItem {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espacio entre ícono y texto/enlace */
+    margin-bottom: 10px; /* Espacio entre ítems de contacto */
+    color: #555; /* Color de texto para los detalles */
+    font-size: 1rem;
+  }
+  
+  /* Estilo para el ícono de contacto */
+  .contactIcon {
+    font-size: 1.1rem;
+    color: #e91e63; /* Color rosa principal para los iconos de contacto */
+    flex-shrink: 0; /* Evita que el ícono se achique */
+  }
+  
+  /* Estilo para los enlaces de contacto (teléfono, email) */
+  .contactLink {
+    color: #555; /* Color de texto similar al texto normal */
+    text-decoration: none; /* Quita el subrayado */
+    transition: color 0.2s ease-in-out;
+  }
+  
+  .contactLink:hover {
+    color: #e91e63; /* Color rosa principal al pasar el mouse */
+    text-decoration: underline; /* Subrayado al pasar el mouse */
+  }
+  
+  /* Estilo para el texto de dirección (no es un enlace) */
+  .contactText {
+      /* Ya estilizado por .contactItem */
+  }
+  
+  
+  /* Estilos para los ítems de Horarios */
+  .hoursItem {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espacio entre ícono y texto */
+    margin-bottom: 10px; /* Espacio entre ítems de horario */
+    color: #555; /* Color de texto para los detalles */
+    font-size: 1rem;
+  }
+  
+  /* Estilo para el ícono de horario */
+  .hoursIcon {
+    font-size: 1.1rem;
+    color: #e91e63; /* Color rosa principal para los iconos de horario */
+    flex-shrink: 0;
+  }
+  
+  /* Estilo para el texto de horario */
+  .hoursText {
+      /* Ya estilizado por .hoursItem */
+  }
+  
+  
+  /* Estilos para la sección Síguenos */
+  .followUsText {
+    font-size: 1rem;
+    color: #555; /* Color de texto para la descripción */
+    margin-top: 0;
+    margin-bottom: 20px; /* Espacio debajo del texto descriptivo */
+  }
+  
+  /* Contenedor de iconos de redes sociales */
+  .socialIcons {
+    display: flex;
+    gap: 15px; /* Espacio entre los iconos */
+    /* Puedes centrar los iconos si quieres: justify-content: center; */
+  }
+  
+  /* Estilo para cada ícono de red social individual (dentro de un enlace <a>) */
+  .socialIcon {
+    font-size: 1.5rem; /* Tamaño de los iconos */
+    color: #1a2a4d; /* Color oscuro principal para los iconos por defecto */
+    transition: color 0.2s ease-in-out;
+  }
+  
+  /* Estilo al pasar el mouse por encima de los iconos sociales */
+  .socialIcons a:hover .socialIcon {
+    color: #e91e63; /* Color rosa principal al pasar el mouse */
+  }
+  
+  
+  /* Línea separadora antes del copyright */
+  .copyrightSeparator {
+    border-top: 1px solid #ffcdd2; /* Borde rosa pastel suave */
+    margin: 30px auto; /* Margen arriba/abajo, auto para centrar si tiene ancho fijo */
+    width: 100%; /* Ocupa todo el ancho disponible */
+    max-width: 800px; /* Ancho máximo de la línea */
+  }
+  
+  /* Estilos para la sección de Copyright */
+  .copyright {
+    font-size: 0.9rem;
+    color: #555; /* Color de texto secundario */
+    text-align: center; /* Centra el texto */
+    margin-top: 20px; /* Espacio arriba del copyright */
+  }
+  
+  
+  /* ===================== Estilos Responsive para el Footer ===================== */
+  
+  @media (max-width: 600px) {
+    .footer {
+      padding: 30px 15px; /* Reduce padding en mobile */
+    }
+  
+    .footerContent {
+       padding: 0; /* Quita padding horizontal interno en mobile */
+    }
+  
+    .footerColumns {
+      /* En mobile, las columnas se apilarán por defecto con grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); */
+      /* Puedes ajustar el minmax si quieres que sean más estrechas en mobile */
+      grid-template-columns: 1fr; /* Una sola columna en mobile */
+      gap: 20px; /* Reduce espacio entre las secciones apiladas */
+      margin-bottom: 20px;
+    }
+  
+    .columnTitle {
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+    }
+  
+    .contactItem,
+    .hoursItem {
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+      gap: 8px; /* Reduce espacio entre ícono y texto */
+    }
+  
+    .contactIcon,
+    .hoursIcon {
+      font-size: 1rem;
+    }
+  
+    .followUsText {
+       font-size: 0.95rem;
+       margin-bottom: 15px;
+    }
+  
+    .socialIcons {
+       justify-content: center; /* Centra los iconos sociales en mobile */
+       gap: 10px; /* Reduce espacio entre iconos */
+    }
+  
+     .socialIcon {
+        font-size: 1.3rem; /* Reduce tamaño iconos sociales */
+     }
+  
+    .copyrightSeparator {
+       margin: 20px auto; /* Reduce margen de la línea separadora */
+    }
+  
+    .copyright {
+      font-size: 0.8rem;
+      margin-top: 15px;
+    }
+  }
+  

@@ -1,0 +1,187 @@
+/* Contenedor principal de la página de inicio de sesión */
+.loginPageContainer {
+    /* Ocupa toda la altura disponible (menos header/footer si están en el layout) */
+    min-height: calc(100vh - var(--header-height, 0px) - var(--footer-height, 0px)); /* Ajusta si header/footer tienen altura fija */
+    display: flex; /* Usa flexbox para centrar el contenido */
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center; /* Centra verticalmente */
+    padding: 20px; /* Padding alrededor del contenido */
+    background-color: #fdebf2; /* Fondo rosa pastel suave, similar al de la sección About Us */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* Misma fuente */
+    color: #333; /* Color de texto por defecto */
+}
+
+/* Contenedor central para el formulario (el "recuadro" blanco/gris) */
+.loginBox {
+    background-color: #ffffff; /* Fondo blanco */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    width: 100%; /* Ocupa todo el ancho disponible hasta el max-width */
+    max-width: 400px; /* Ancho máximo del recuadro */
+    text-align: center; /* Centra el texto dentro del recuadro */
+}
+
+/* Título "Acceso Administrativo" */
+.pageTitle {
+    font-size: 1.8rem;
+    color: #1a2a4d; /* Color oscuro principal de tu marca */
+    margin-top: 0;
+    margin-bottom: 30px; /* Espacio debajo del título */
+    /* Opcional: línea separadora */
+    /* border-bottom: 1px solid #eee; padding-bottom: 15px; */
+}
+
+/* Contenedor del formulario */
+.loginForm {
+    display: flex;
+    flex-direction: column; /* Apila los campos verticalmente */
+    gap: 20px; /* Espacio entre los campos del formulario */
+    margin-bottom: 20px; /* Espacio entre el formulario y el texto explicativo */
+}
+
+/* Contenedor individual para cada campo del formulario (Label + Input) */
+.formField {
+    display: flex;
+    flex-direction: column; /* Apila Label y Input */
+    gap: 5px; /* Espacio entre label y input */
+    text-align: left; /* Alinea el texto y label a la izquierda dentro del campo */
+}
+
+/* Estilos para las etiquetas (Label) de los campos */
+.formLabel {
+    display: block; /* Asegura que el label esté en su propia línea */
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #555; /* Color de texto secundario */
+}
+
+/* Estilos para los campos de entrada (Input) */
+.formInput {
+    width: 100%; /* Ocupa todo el ancho de su contenedor (formField) */
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    box-sizing: border-box; /* Incluye padding y border */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* Misma fuente */
+    color: #333;
+    background-color: #f8f8f8; /* Fondo ligeramente gris */
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+/* Estilo al hacer foco en los campos de entrada */
+.formInput:focus {
+    border-color: #e91e63; /* Borde rosa al hacer foco */
+    outline: none; /* Quita el outline por defecto */
+    box-shadow: 0 0 0 0.2rem rgba(233, 30, 99, 0.25); /* Sombra de foco rosa semi-transparente */
+    background-color: #ffffff; /* Fondo blanco al hacer foco */
+}
+
+/* Estilo para el botón de Iniciar Sesión */
+.loginButton {
+    background-color: #e91e63; /* Color verde como en la imagen de referencia */
+    color: white;
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, opacity 0.2s ease-in-out;
+    width: 100%; /* Ocupa todo el ancho del formulario */
+    margin-top: 10px; /* Espacio arriba del botón */
+    /* Puedes ajustar el color a un tono rosa si prefieres que siga la paleta principal */
+    /* background-color: #e91e63; */
+}
+
+/* Estilo al pasar el mouse por encima del botón */
+.loginButton:hover:not(:disabled) {
+    background-color: #f88eb2; /* Verde más oscuro */
+    color: #1f020c;
+    /* background-color: #d81b60; /* Rosa más oscuro si usas rosa */
+}
+
+/* Estilo para el botón deshabilitado */
+.loginButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Estilos para el texto explicativo debajo del formulario */
+.explanatoryText {
+    font-size: 0.9rem;
+    color: #777; /* Color de texto más claro */
+    margin-top: 15px; /* Espacio arriba del texto */
+}
+
+/* Estilos para mensajes de carga */
+.loadingMessage {
+    text-align: center;
+    color: #1a2a4d; /* Color oscuro de tu marca */
+    font-size: 1.1rem;
+    margin: 20px 0;
+    padding: 10px;
+    background-color: #fdebf2; /* Fondo rosa pastel */
+    border: 1px solid #ffcdd2; /* Borde rosa suave */
+    border-radius: 4px;
+}
+
+/* Estilos para mensajes de error */
+.errorMessage {
+    text-align: center;
+    color: #d32f2f; /* Un color rojo estándar para errores */
+    font-size: 1rem;
+    margin: 20px 0;
+    padding: 10px;
+    background-color: #ffcdd2; /* Fondo rosa/rojo claro */
+    border: 1px solid #ef9a9a; /* Borde rojo suave */
+    border-radius: 4px;
+}
+
+
+/* ===================== Estilos Responsive para LoginPage ===================== */
+
+@media (max-width: 600px) {
+    .loginPageContainer {
+        padding: 15px; /* Reduce padding en mobile */
+    }
+
+    .loginBox {
+        padding: 20px; /* Reduce padding interno del recuadro */
+    }
+
+    .pageTitle {
+        font-size: 1.6rem; /* Reduce tamaño del título */
+        margin-bottom: 20px;
+    }
+
+    .loginForm {
+        gap: 15px; /* Reduce espacio entre campos */
+        margin-bottom: 15px;
+    }
+
+    .formField {
+        gap: 4px; /* Reduce espacio entre label y input */
+    }
+
+    .formLabel {
+        font-size: 0.9rem;
+    }
+
+    .formInput {
+        padding: 8px 10px; /* Reduce padding del input */
+        font-size: 0.95rem;
+    }
+
+    .loginButton {
+        padding: 10px 15px; /* Reduce padding del botón */
+        font-size: 1rem;
+        margin-top: 8px;
+    }
+
+    .explanatoryText {
+        font-size: 0.8rem;
+        margin-top: 10px;
+    }
+}
