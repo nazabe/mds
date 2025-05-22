@@ -7,7 +7,7 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: '',
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -25,7 +25,7 @@ const LoginPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!formData.username || !formData.password) {
+    if (!formData.email || !formData.password) {
         setError("Por favor, ingrese usuario y contraseña.");
         return;
     }
@@ -34,60 +34,52 @@ const LoginPage: React.FC = () => {
     setError(null);
 
     try {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        const response = await fetch('https://web-spa-hjzu.onrender.com/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: formData.email,
+          password: formData.password,
+        }),
+      });
 
-        let success = false;
-        let role = '';
-        let professionalEmail: string | null = null; // Variable para guardar el email del profesional
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Credenciales incorrectas.');
+        } else {
+          throw new Error('Error en el servidor. Intenta más tarde.');
+        }
+      }
 
-        // Credenciales de administrador simuladas
-        if (formData.username === 'admin' && formData.password === 'password123') {
-            success = true;
-            role = 'admin';
-        }
-        // Credenciales de profesional simuladas
-        else if (formData.username === 'ana.felicidad@spa.com' && formData.password === 'profpass') {
-            success = true;
-            role = 'professional';
-            professionalEmail = formData.username; // Guarda el email si es profesional
-        }
-        else if (formData.username === 'dra.lopez@spa.com' && formData.password === 'profpass') {
-            success = true;
-            role = 'professional';
-            professionalEmail = formData.username;
-        }
-        else if (formData.username === 'dr.garcia@spa.com' && formData.password === 'profpass') {
-            success = true;
-            role = 'professional';
-            professionalEmail = formData.username;
-        }
-        else if (formData.username === 'lic.perez@spa.com' && formData.password === 'profpass') {
-            success = true;
-            role = 'professional';
-            professionalEmail = formData.username;
-        }
-        else {
-            setError("Usuario o contraseña incorrectos.");
-        }
+      const data = await response.json();
 
-        if (success) {
-            localStorage.setItem('authToken', `fake-${role}-token-${Date.now()}`);
-            localStorage.setItem('userRole', role);
-            if (professionalEmail) {
-                localStorage.setItem('userEmailForProfessional', professionalEmail); // Guarda el email del profesional
-            } else {
-                localStorage.removeItem('userEmailForProfessional'); // Asegúrate de limpiar si no es profesional
-            }
-            console.log(`Inicio de sesión exitoso como ${role}. Redirigiendo...`);
-            navigate('/admin/dashboard'); // Redirige al dashboard de administración (ProtectedRoute manejará la redirección a /professional/dashboard si es profesional)
-        }
+      const { token, role, email } = data;
 
-    } catch (err: any) {
-        console.error("Error durante el login:", err);
-        setError(err.message || "Ocurrió un error al intentar iniciar sesión.");
-    } finally {
-        setIsLoading(false);
-    }
+      localStorage.setItem('authToken', token);
+      localStorage.setItem('userRole', role);
+      localStorage.setItem('userEmailForProfessional', email);
+
+      console.log(`Inicio de sesión exitoso como ${role}. Redirigiendo...`);
+
+      // Redirecciona al dashboard correspondiente
+      if (role === 'ADMIN') {
+        navigate('/admin/dashboard');
+      } else if (role === 'USER') {
+        navigate('/professional/dashboard');
+      } else {
+        throw new Error('Rol desconocido.');
+      }
+    } catch (err: unknown) {
+      console.error("Error durante el login:", err);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Ocurrió un error al intentar iniciar sesión.");
+      }
+
+    
   };
 
   return (
@@ -98,15 +90,15 @@ const LoginPage: React.FC = () => {
         {isLoading && <div className={styles.loadingMessage}>Iniciando sesión...</div>}
         <form className={styles.loginForm} onSubmit={handleSubmit}>
           <div className={styles.formField}>
-            <label className={styles.formLabel} htmlFor="username">Usuario</label>
+            <label className={styles.formLabel} htmlFor="email">Usuario</label>
             <input
               type="text"
-              id="username"
-              name="username"
+              id="email"
+              name="email"
               className={styles.formInput}
-              value={formData.username}
+              value={formData.email}
               onChange={handleInputChange}
-              placeholder="Ingresa tu usuario (ej: admin o tu.email@spa.com)"
+              placeholder="Ingresa tu email"
               required
               disabled={isLoading}
             />
@@ -128,7 +120,7 @@ const LoginPage: React.FC = () => {
           <button
             type="submit"
             className={styles.loginButton}
-            disabled={!formData.username || !formData.password || isLoading}
+            disabled={!formData.email || !formData.password || isLoading}
           >
             {isLoading ? 'Iniciando...' : 'INICIAR SESIÓN'}
           </button>
