@@ -1,47 +1,49 @@
-/* src/components/ServiceManagement/ServiceManagement.module.css */
+
+
 .serviceManagementContainer {
-    max-width: 900px;
     margin: 40px auto;
-    padding: 30px;
-    background-color: #ffffff;
+    background-color: #fdebf2; /* Fondo de página rosa muy pálido, como en la imagen */
     border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    color: #333;
+    /* El color por defecto para texto fuera de los cards puede ser el rosa oscuro o un gris */
+    /* color: #c2185b; */
+    width: 100%;
+    max-width: none; /* Si estás usando algún tipo de limitación */
+    padding: 0 20px;  /* Solo si necesitas márgenes internos */
+    box-sizing: border-box;
 }
 
 .title {
     font-size: 2.2rem;
-    color: #1a2a4d;
+    color: #1a2a4d; /* Gris oscuro para el título principal */
     text-align: center;
     margin-bottom: 30px;
 }
 
 .message {
-    background-color: #e0ffe0; /* Verde claro para éxito */
-    color: #28a745;
-    border: 1px solid #28a745;
+    background-color: #ffe0e6;
+    color: #c2185b;
+    border: 1px solid #f48fb1;
     padding: 10px;
     border-radius: 5px;
     margin-bottom: 20px;
     text-align: center;
 }
 
-/* Sección para añadir servicio */
 .addServiceSection {
     margin-bottom: 40px;
     padding: 20px;
-    border: 1px solid #f0f0f0;
+    border: 1px solid #ffcdd2;
     border-radius: 8px;
-    background-color: #f9f9f9;
+    background-color: #ffffff; /* Sección de añadir sobre fondo blanco para contraste */
 }
 
 .sectionTitle {
     font-size: 1.6rem;
-    color: #1a2a4d;
+    color: #333333;
     margin-top: 0;
     margin-bottom: 20px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #f48fb1;
     padding-bottom: 10px;
 }
 
@@ -55,28 +57,35 @@
 .textareaField {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #ddd;
+    border: 1px solid #ffcdd2;
     border-radius: 5px;
     font-size: 1rem;
     box-sizing: border-box;
-    transition: border-color 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background-color: #ffffff;
+    color: #c2185b;
+}
+
+.inputField::placeholder,
+.textareaField::placeholder {
+    color: #f4a7c0;
 }
 
 .textareaField {
-    resize: vertical; /* Permite redimensionar verticalmente */
-    grid-column: 1 / -1; /* Ocupa todo el ancho en la cuadrícula */
+    resize: vertical;
+    grid-column: 1 / -1;
+    min-height: 100px;
 }
-
 
 .inputField:focus,
 .textareaField:focus {
     border-color: #e91e63;
     outline: none;
-    box-shadow: 0 0 0 2px rgba(233, 30, 99, 0.2);
+    box-shadow: 0 0 0 2px rgba(233, 30, 99, 0.25);
 }
 
 .addButton {
-    background-color: #1a2a4d;
+    background-color: #e91e63;
     color: white;
     padding: 10px 15px;
     border: none;
@@ -88,11 +97,11 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    grid-column: 1 / -1; /* Ocupa todo el ancho en la cuadrícula */
+    grid-column: 1 / -1;
 }
 
 .addButton:hover {
-    background-color: #2a3a5d;
+    background-color: #d81b60;
 }
 
 /* Lista de servicios */
@@ -101,81 +110,104 @@
 }
 
 .serviceList {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
 }
 
 .serviceItem {
-    background-color: #fefefe;
-    border: 1px solid #eee;
+    background-color: #ffffff;
     border-radius: 8px;
     padding: 20px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    box-shadow: 0 3px 10px rgba(233, 30, 99, 0.12);
     display: flex;
-    align-items: flex-start; /* Alinea items al inicio */
     gap: 20px;
+    
+    width: 100%;
+    box-sizing: border-box;
+    flex-direction: row; /* lado a lado en pantallas grandes */
+    align-items: flex-start;
+    text-align: left;
+
+    padding: 0;
 }
 
 .serviceImage {
-    width: 100px;
-    height: 70px;
+    width: 90px;  /* Tamaño de la imagen como en el ejemplo */
+    height: 90px; /* Haciéndola cuadrada */
     object-fit: cover;
-    border-radius: 4px;
-    flex-shrink: 0; /* Evita que la imagen se encoja */
+    border-radius: 6px; /* Bordes redondeados para la imagen */
+    flex-shrink: 0;
+    /* Sin borde visible en la imagen en sí */
 }
 
-.infoText {
-    flex-grow: 1; /* Permite que el texto ocupe el espacio restante */
+/* Contenedor para el texto y los botones de acción, para controlar su layout */
+.serviceContent {
+    display: flex;
+    flex-direction: column; /* Texto arriba, botones abajo */
+    justify-content: space-between; /* Separa texto de botones si hay espacio */
+    flex-grow: 1; /* Ocupa el espacio restante */
 }
 
-.serviceDetails p {
-    margin: 5px 0;
+.infoText p { /* Estilo para Nombre, Descripción, Precio, Duración */
+    margin: 0 0 8px 0; /* Espacio debajo de cada línea de info, sin margen superior */
     font-size: 1rem;
-    color: #555;
+    color: #e75480; /* Rosa intenso para el texto, como en la imagen */
+    line-height: 1.4;
 }
 
-.serviceDetails strong {
-    color: #1a2a4d;
+.infoText p:last-child {
+    margin-bottom: 0; /* Quita margen del último P si los botones van justo debajo */
 }
 
+/* No es necesario .serviceDetails strong si todo el texto tiene el mismo estilo */
+
+/* Contenedor de los botones de acción */
 .actions {
     display: flex;
-    flex-direction: column; /* Apila los botones de acción */
-    gap: 10px;
-    margin-left: auto; /* Empuja los botones a la derecha */
-    align-items: flex-end; /* Alinea los botones a la derecha */
+    flex-direction: column; /* Botones uno debajo del otro */
+    align-items: flex-end; /* Alinea los botones a la derecha de este contenedor */
+    gap: 10px; /* Espacio entre botones */
+    margin-top: 15px; /* Espacio entre el texto y los botones */
 }
 
 .actionButton {
-    padding: 8px 12px;
+    padding: 7px 18px; /* Padding ajustado para botones */
     border: none;
     border-radius: 5px;
     font-size: 0.9rem;
+    font-weight: 500; /* Un poco más de peso */
     cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background-color 0.2s ease, transform 0.1s ease;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px; /* Espacio entre icono y texto */
+    min-width: 100px; /* Ancho mínimo para que los botones se vean similares */
+    justify-content: center; /* Centra contenido si el texto es corto */
+}
+
+.actionButton:hover {
+    transform: translateY(-1px); /* Ligero efecto al pasar el mouse */
 }
 
 .editButton {
-    background-color: #ffa000;
-    color: white;
+    background-color: #ffab91; /* Un coral/salmón más suave como en la imagen (Material Deep Orange 200) */
+    color: #444444; /* Texto oscuro para buena legibilidad */
 }
 
 .editButton:hover {
-    background-color: #ff8f00;
+    background-color: #ff8a65; /* Coral/salmón un poco más intenso (Material Deep Orange 300) */
 }
 
 .deleteButton {
-    background-color: #f44336;
+    background-color: #f50057; /* Fucsia (Material Pink A400) */
     color: white;
 }
 
 .deleteButton:hover {
-    background-color: #d32f2f;
+    background-color: #c51162; /* Fucsia más oscuro (Material Pink A700) */
 }
 
 /* Modo edición */
@@ -185,10 +217,28 @@
     gap: 10px;
     align-items: center;
     width: 100%;
+    background-color: #fff0f5;
+    padding: 15px;
+    border-radius: 6px;
+    margin-top: 10px;
+    border: 1px solid #ffcdd2;
+}
+
+.serviceDetails {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  gap: 20px;
+  box-shadow: 0 3px 10px rgba(233, 30, 99, 0.12);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .editActions {
-    grid-column: 1 / -1; /* Ocupa todas las columnas */
+    grid-column: 1 / -1;
     display: flex;
     justify-content: flex-end;
     gap: 10px;
@@ -196,73 +246,101 @@
 }
 
 .saveButton {
-    background-color: #28a745;
+    background-color: #e91e63;
     color: white;
 }
 
 .saveButton:hover {
-    background-color: #218838;
+    background-color: #d81b60;
 }
 
 .cancelButton {
-    background-color: #6c757d;
-    color: white;
+    background-color: #ffe0e6;
+    color: #c2185b;
+    border: 1px solid #f48fb1;
 }
 
 .cancelButton:hover {
-    background-color: #5a6268;
+    background-color: #ffcdd2;
+    border-color: #e91e63;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
     .serviceManagementContainer {
-        padding: 20px;
-        margin: 20px auto;
+        padding: 20px 15px;
+        margin: 20px 10px;
     }
 
     .title {
         font-size: 1.8rem;
+        margin-bottom: 20px;
     }
 
     .sectionTitle {
         font-size: 1.4rem;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+    }
+    
+    .addServiceSection {
+        padding: 15px;
+        margin-bottom: 30px;
     }
 
     .formGrid,
     .editForm {
-        grid-template-columns: 1fr; /* Una columna en mobile */
+        grid-template-columns: 1fr;
     }
 
-    .addButton,
-    .actionButton {
-        width: 100%; /* Botones de ancho completo */
-        justify-content: center;
+    .addButton {
+        width: 100%;
+    }
+
+    .parentContainer {
+        width: 100%;
+        max-width: none; /* o el valor que necesites */
     }
 
     .serviceItem {
-        flex-direction: column; /* Apila imagen y detalles en mobile */
-        align-items: center;
-        text-align: center;
+        flex-direction: column;    /* Apila contenido */
+        align-items: center;       /* Centra contenido */
+        text-align: center;        /* Centra texto */
     }
 
     .serviceImage {
+        width: 120px;
+        height: 120px;
         margin-bottom: 15px;
     }
 
-    .infoText {
-        width: 100%; /* Ocupa todo el ancho disponible */
+    .serviceContent {
+        width: 100%; /* Asegura que ocupe todo el ancho */
+        align-items: center; /* Centra el infoText y los actions */
+    }
+    
+    .infoText { /* En móvil, el texto ya está centrado por serviceItem */
+        width: 100%;
     }
 
     .actions {
-        flex-direction: row; /* Vuelve a poner los botones en fila en mobile */
-        justify-content: center;
-        width: 100%;
-        margin-left: 0;
+        align-items: center; /* Centra los botones en móvil */
+        width: 100%; /* Ocupa el ancho para que los botones se distribuyan */
         margin-top: 20px;
     }
 
+    .actionButton {
+        width: 80%; /* O un max-width para que no sean excesivamente anchos */
+        max-width: 250px;
+        padding: 10px 15px; /* Botones más grandes en móvil para facilidad de toque */
+    }
+    
     .editActions {
-        flex-direction: row;
-        justify-content: center;
+        flex-direction: column; /* Apila botones de guardar/cancelar */
+        gap: 10px;
+    }
+    .editActions .saveButton,
+    .editActions .cancelButton {
+        width: 100%; /* Ancho completo para botones de formulario de edición */
     }
 }

@@ -58,16 +58,47 @@
 
 /* Estilos para los campos de entrada (Input) */
 .formInput {
-    width: 100%; /* Ocupa todo el ancho de su contenedor (formField) */
+    width: 100%;
     padding: 10px 12px;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 1rem;
-    box-sizing: border-box; /* Incluye padding y border */
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* Misma fuente */
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    /* He cambiado el color de texto a un gris oscuro estándar.
+       #ef9a9a es un rojo claro, generalmente usado para errores, no para texto de input.
+       Si #ef9a9a era intencional para el texto, puedes revertirlo. */
     color: #333;
-    background-color: #f8f8f8; /* Fondo ligeramente gris */
-    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    background-color: #f8f8f8 !important; /* Fondo ligeramente gris, !important para asegurar precedencia inicial */
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out; /* Añadido background-color a la transición */
+}
+
+/* Estilos para anular el autocompletado del navegador (especialmente Chrome/Safari) */
+.formInput:-webkit-autofill,
+.formInput:-webkit-autofill:hover,
+.formInput:-webkit-autofill:focus,
+.formInput:-webkit-autofill:active {
+    /* El truco es usar una box-shadow interna muy grande del color de fondo deseado.
+       Esto "pinta" sobre el fondo que pone el navegador. */
+    box-shadow: 0 0 0px 1000px #f8f8f8 inset !important;
+    /* También puedes forzar el color del texto si el navegador lo cambia */
+    -webkit-text-fill-color: #333 !important; /* Cambia a tu color de texto deseado */
+    /* Si quieres una transición suave para el fondo del autocompletado */
+    transition: background-color 5000s ease-in-out 0s;
+    /* Puedes también intentar forzar la fuente si es necesario, aunque box-shadow suele ser suficiente */
+    /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important; */
+}
+
+/* Estilo al hacer foco en los campos de entrada (asegúrate que este también funcione bien) */
+.formInput:focus {
+    border-color: #e91e63; /* Borde rosa al hacer foco */
+    outline: none;
+    /* La sombra de foco puede necesitar !important si hay conflictos,
+       pero usualmente el autofill no afecta la sombra de foco directa */
+    box-shadow: 0 0 0 0.2rem rgba(233, 30, 99, 0.25);
+    background-color: #ffffff !important; /* Fondo blanco al hacer foco, !important para asegurar que sobreescriba el #f8f8f8 del autofill */
+    /* Si el texto se ve afectado por el autofill incluso en focus */
+    -webkit-text-fill-color: #333 !important; /* O el color de texto que desees en focus */
 }
 
 /* Estilo al hacer foco en los campos de entrada */

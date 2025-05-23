@@ -1,26 +1,37 @@
 /* src/components/ProfessionalManagement/ProfessionalManagement.module.css */
+
+/* Paleta base para referencia rápida:
+   Rosa Pastel Claro: #fdebf2, #ffe0e6
+   Rosa Pastel Medio: #ffcdd2
+   Rosa Intenso: #e91e63, #d81b60 (hover)
+   Rosa para Texto Oscuro: #c2185b
+   Blanco/Casi Blanco: #ffffff, #fffafa
+*/
+
 .professionalManagementContainer {
     max-width: 900px;
     margin: 40px auto;
     padding: 30px;
-    background-color: #ffffff;
+    background-color: #fffafa; /* Casi blanco, más cálido que #ffffff */
     border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    /* Sombra con tinte rosa de marca */
+    box-shadow: 0 4px 15px rgba(233, 30, 99, 0.1);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    color: #333;
+    color: #272727; /* Color de texto principal: rosa oscuro */
 }
 
 .title {
     font-size: 2.2rem;
-    color: #1a2a4d;
+    color: #272727; /* Rosa intenso para títulos principales */
     text-align: center;
     margin-bottom: 30px;
 }
 
 .message {
-    background-color: #e0ffe0; /* Verde claro para éxito */
-    color: #28a745;
-    border: 1px solid #28a745;
+    /* Mensaje de éxito con tonos rosa */
+    background-color: #ffe0e6; /* Fondo rosa pastel muy claro */
+    color: #272727; /* Texto rosa oscuro */
+    border: 1px solid #f48fb1; /* Borde rosa medio-pastel (entre #ffcdd2 y #e91e63) */
     padding: 10px;
     border-radius: 5px;
     margin-bottom: 20px;
@@ -31,17 +42,20 @@
 .addProfessionalSection {
     margin-bottom: 40px;
     padding: 20px;
-    border: 1px solid #f0f0f0;
+    /* Borde rosa pastel */
+    border: 1px solid #ffcdd2;
     border-radius: 8px;
-    background-color: #f9f9f9;
+    /* Fondo rosa pastel claro */
+    background-color: #fdebf2;
 }
 
 .sectionTitle {
     font-size: 1.6rem;
-    color: #1a2a4d;
+    color: #272727; /* Rosa intenso, ligeramente más oscuro para subtítulos */
     margin-top: 0;
     margin-bottom: 20px;
-    border-bottom: 1px solid #eee;
+    /* Borde inferior rosa pastel medio */
+    border-bottom: 1px solid #f48fb1;
     padding-bottom: 10px;
 }
 
@@ -54,21 +68,28 @@
 .inputField {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #ddd;
+    /* Borde rosa pastel medio */
+    border: 1px solid #ffcdd2;
     border-radius: 5px;
     font-size: 1rem;
     box-sizing: border-box;
-    transition: border-color 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background-color: #ffffff; /* Fondo blanco para inputs */
+    color: #272727; /* Texto rosa oscuro en inputs */
+}
+
+.inputField::placeholder {
+    color: #f4a7c0; /* Rosa pastel más claro para placeholder */
 }
 
 .inputField:focus {
-    border-color: #e91e63;
+    border-color: #e91e63; /* Rosa intenso de marca */
     outline: none;
-    box-shadow: 0 0 0 2px rgba(233, 30, 99, 0.2);
+    box-shadow: 0 0 0 2px rgba(233, 30, 99, 0.25); /* Sombra de foco rosa */
 }
 
 .addButton {
-    background-color: #1a2a4d;
+    background-color: #e91e63; /* Rosa intenso de marca */
     color: white;
     padding: 10px 15px;
     border: none;
@@ -83,7 +104,7 @@
 }
 
 .addButton:hover {
-    background-color: #2a3a5d;
+    background-color: #d81b60; /* Rosa más oscuro para hover */
 }
 
 /* Lista de profesionales */
@@ -98,12 +119,14 @@
 }
 
 .professionalItem {
-    background-color: #fefefe;
-    border: 1px solid #eee;
+    background-color: #ffffff; /* Fondo blanco para items */
+    /* Borde rosa pastel */
+    border: 1px solid #fdebf2;
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 15px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    /* Sombra rosa muy sutil */
+    box-shadow: 0 2px 8px rgba(233, 30, 99, 0.07);
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -112,11 +135,12 @@
 .professionalDetails p {
     margin: 5px 0;
     font-size: 1rem;
-    color: #555;
+    color: #272727; /* Texto rosa oscuro */
 }
 
 .professionalDetails strong {
-    color: #1a2a4d;
+    color: #d81b60; /* Rosa intenso más oscuro para destacar */
+    font-weight: 600;
 }
 
 .actions {
@@ -136,24 +160,27 @@
     display: flex;
     align-items: center;
     gap: 5px;
+    color: white; /* Texto blanco para la mayoría de botones de acción */
 }
 
 .editButton {
-    background-color: #ffa000;
-    color: white;
+    /* Un rosa coral o melocotón para "editar" */
+    background-color: #ff8a80; /* Coral claro (Material Red A100) */
+    color: #7f0000; /* Un rojo oscuro para el texto para contraste */
 }
 
 .editButton:hover {
-    background-color: #ff8f00;
+    background-color: #ff5252; /* Coral más intenso (Material Red A200) */
 }
 
 .deleteButton {
-    background-color: #f44336;
+    /* Un rosa fuerte o fucsia para "eliminar" */
+    background-color: #f50057; /* Fucsia (Material Pink A400) */
     color: white;
 }
 
 .deleteButton:hover {
-    background-color: #d32f2f;
+    background-color: #c51162; /* Fucsia más oscuro (Material Pink A700) */
 }
 
 /* Modo edición */
@@ -162,6 +189,12 @@
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 10px;
     align-items: center;
+    /* Fondo ligeramente diferente para el formulario de edición si está dentro de .professionalItem */
+    background-color: #fff0f5; /* LavenderBlush, un rosa muy pálido */
+    padding: 15px;
+    border-radius: 6px;
+    margin-top: 10px;
+    border: 1px solid #ffcdd2;
 }
 
 .editActions {
@@ -173,36 +206,47 @@
 }
 
 .saveButton {
-    background-color: #28a745;
+    background-color: #e91e63; /* Rosa intenso de marca para "guardar" */
     color: white;
 }
 
 .saveButton:hover {
-    background-color: #218838;
+    background-color: #d81b60; /* Más oscuro */
 }
 
 .cancelButton {
-    background-color: #6c757d;
-    color: white;
+    /* Un rosa pastel para "cancelar", con borde para destacar */
+    background-color: #ffe0e6;
+    color: #c2185b; /* Texto rosa oscuro */
+    border: 1px solid #f48fb1;
 }
 
 .cancelButton:hover {
-    background-color: #5a6268;
+    background-color: #ffcdd2; /* Un poco más oscuro */
+    border-color: #e91e63;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
     .professionalManagementContainer {
-        padding: 20px;
-        margin: 20px auto;
+        padding: 20px 15px; /* Ajuste de padding */
+        margin: 20px 10px;  /* Ajuste de margen */
     }
 
     .title {
         font-size: 1.8rem;
+        margin-bottom: 20px;
     }
 
     .sectionTitle {
         font-size: 1.4rem;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+    }
+
+    .addProfessionalSection {
+        padding: 15px;
+        margin-bottom: 30px;
     }
 
     .formGrid,
@@ -210,15 +254,22 @@
         grid-template-columns: 1fr; /* Una columna en mobile */
     }
 
-    .addButton,
-    .actionButton {
-        width: 100%; /* Botones de ancho completo */
-        justify-content: center;
+    .addButton { /* Ya tenía display: flex, así que width 100% funciona bien */
+        width: 100%;
     }
 
     .actions,
     .editActions {
         flex-direction: column;
         gap: 8px;
+    }
+    
+    .actionButton { /* Aplicar width 100% a todos los botones de acción en móvil */
+        width: 100%;
+        justify-content: center;
+    }
+
+    .professionalItem {
+        padding: 15px;
     }
 }
