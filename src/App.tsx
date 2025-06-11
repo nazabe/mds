@@ -1,18 +1,40 @@
 import { Link } from 'react-router-dom';
-import { useRef } from 'react';
+import { useRef } from 'react'; // React ya está importado
 import { FaMapMarkerAlt, FaArrowRight, FaPhone, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import styles from './App.module.css';
+import { ChatbotIcon } from './components/chatbot/chatbot'; // Asegúrate que la ruta sea correcta
 
 function App() {
-  const servicesScrollRef = useRef<HTMLDivElement>(null);
 
-  const scrollServices = (direction: 'left' | 'right') => {
-    servicesScrollRef.current?.scrollBy({
-      left: direction === 'left' ? -300 : 300,
-      behavior: 'smooth',
-    });
+  const servicesScrollRef = useRef<HTMLDivElement>(null); // Especificamos que la referencia es para un div
+
+    const scrollLeft = () => {
+    if (servicesScrollRef.current) {
+      servicesScrollRef.current.scrollBy({
+        left: -300, // Ajusta la cantidad de scroll (en píxeles)
+        behavior: 'smooth', // Animación suave
+      });
+    }
   };
 
+  // Función para hacer scroll a la derecha en la sección de Servicios
+  const scrollRight = () => {
+    if (servicesScrollRef.current) {
+      servicesScrollRef.current.scrollBy({
+        left: 300, // Ajusta la cantidad de scroll (en píxeles)
+        behavior: 'smooth', // Animación suave
+      });
+    }
+  };
+
+  // const scrollServices = (direction) => { // Eliminamos tipado para JS puro
+  //   servicesScrollRef.current?.scrollBy({
+  //     left: direction === 'left' ? -300 : 300,
+  //     behavior: 'smooth',
+  //   });
+  // };
+
+  // ... (tu código existente de contactItems y serviceCards se mantiene igual)
   const contactItems = [
     {
       icon: <FaPhone className={styles.contactIcon} />,
@@ -39,9 +61,11 @@ function App() {
     { src: '/mds/images/services/ai-generated-8270432_1280.jpg', title: 'Depilación Facial' },
   ];
 
+
   return (
-    <div className={styles.App}>
+    <div className={styles.App}> {/* Asumo que tienes un styles.App, si no, usa solo 'App' */}
       <main className={styles.hero}>
+        {/* ... (tu contenido de hero se mantiene igual) ... */}
         <div className={styles.heroContent}>
           <h1 className={styles.heroHeading}>Reserva turnos con los mejores profesionales de la Belleza</h1>
           <p className={styles.heroDescription}>Descubre la belleza con nosotros. ¡Reserva tu turno hoy mismo!</p>
@@ -52,6 +76,7 @@ function App() {
       </main>
 
       <section id="quienes-somos" className={styles.aboutUsSection}>
+        {/* ... (tu contenido de aboutUsSection se mantiene igual) ... */}
         <div className={styles.sectionContent}>
           <h2 className={styles.sectionHeading}>Sobre Nosotros</h2>
           <div className={styles.aboutUsContentColumns}>
@@ -77,6 +102,7 @@ function App() {
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
+                  title="Ubicación del Spa"
                 ></iframe>
               </div>
               <a
@@ -96,6 +122,7 @@ function App() {
       </section>
 
       <section id="profesionales" className={styles.servicesSection}>
+        {/* ... (tu contenido de servicesSection se mantiene igual) ... */}
         <div className={styles.sectionContent}>
           <h2 className={styles.sectionHeading}>Nuestros Servicios</h2>
           <div className={styles.scrollWrapper}>
@@ -108,19 +135,23 @@ function App() {
               ))}
             </div>
             
-            <div className={styles.scrollControls}>
-              <button className={styles.scrollButtonLeft} onClick={() => scrollServices('left')}>
-                <FaChevronLeft />
-              </button>
-              <button className={styles.scrollButtonRight} onClick={() => scrollServices('right')}>
-                <FaChevronRight />
-              </button>
-            </div>
+            <div className={styles.scrollArrowsWrapper}>
+                {/* Flecha Izquierda para Scroll */}
+                <button className={`${styles.scrollArrow} ${styles.scrollArrowLeft}`} onClick={scrollLeft} aria-label="Scroll Left">
+                  <FaChevronLeft />
+                </button>
+                {/* Flecha Derecha para Scroll */}
+                <button className={`${styles.scrollArrow} ${styles.scrollArrowRight}`} onClick={scrollRight} aria-label="Scroll Right">
+                  <FaChevronRight />
+                </button>
+            </div> {/* Fin scrollArrowsWrapper */}
+
           </div>
         </div>
       </section>
 
-
+      {/* Aquí agregamos el ícono del chatbot */}
+      <ChatbotIcon />
     </div>
   );
 }

@@ -629,12 +629,7 @@ const BookingPage: React.FC = () => {
                           <strong>Hora:</strong> {selectedTime}
                       </p>
                   )}
-                  {/* Puedes añadir aquí el precio total si tienes esa lógica */}
-                   {/* {selectedServiceId !== null && (
-                       <p className={styles.summaryDetail}>
-                           <strong>Precio:</strong> {servicesData.find(s => s.id === selectedServiceId)?.price}
-                       </p>
-                   )} */}
+            
               </div> {/* Fin bookingSummary */}
 
 

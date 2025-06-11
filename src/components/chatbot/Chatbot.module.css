@@ -1,0 +1,139 @@
+/* Chatbot.module.css */
+.chatbotIcon {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #e91e63; /* Color principal rosado */
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  transition: transform 0.2s ease-in-out;
+}
+
+.chatbotIcon:hover {
+  transform: scale(1.1);
+  background-color: #d81b60; /* Rosado más oscuro al pasar el mouse */
+}
+
+.chatWindow {
+  position: fixed;
+  bottom: 100px; /* Encima del ícono */
+  right: 30px;
+  width: 350px;
+  max-height: 70vh; /* Máxima altura */
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  z-index: 1001;
+  overflow: hidden; /* Para que el contenido no se salga de los bordes redondeados */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.chatHeader {
+  background-color: #e91e63; /* Color principal rosado */
+  color: white;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+}
+
+.chatHeaderTitle {
+  font-size: 1.1rem;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.messagesContainer {
+  flex-grow: 1;
+  padding: 15px;
+  overflow-y: auto;
+  background-color: #fdf8f5; /* Un rosado muy claro para el fondo del chat */
+}
+
+.message {
+  margin-bottom: 12px;
+  padding: 10px 15px;
+  border-radius: 18px;
+  max-width: 85%;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.userMessage {
+  background-color: #f0f0f0; /* Gris claro para preguntas del usuario */
+  color: #333;
+  margin-left: auto;
+  border-bottom-right-radius: 5px;
+}
+
+.botMessage {
+  background-color: #fce4ec; /* Rosado claro para respuestas del bot */
+  color: #5f273b; /* Un color de texto que contraste bien con el rosado claro */
+  margin-right: auto;
+  border-bottom-left-radius: 5px;
+}
+
+.botMessage strong, .botMessage a {
+  color: #d81b60; /* Rosado más oscuro para enlaces o texto resaltado */
+}
+.botMessage a:hover {
+  text-decoration: underline;
+}
+
+
+.initialBotMessage {
+  background-color: #fce4ec;
+  color: #5f273b;
+  margin-right: auto;
+  border-bottom-left-radius: 5px;
+  text-align: center;
+  font-style: italic;
+}
+
+.questionsListContainer {
+  padding: 15px;
+  border-top: 1px solid #eee;
+  background-color: #fff; /* Fondo blanco para las opciones de preguntas */
+}
+
+.questionButton {
+  display: block;
+  width: 100%;
+  background-color: #fff;
+  color: #e91e63; /* Texto rosado */
+  border: 1px solid #e91e63; /* Borde rosado */
+  padding: 10px 15px;
+  margin-bottom: 8px;
+  border-radius: 20px;
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.95rem;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.questionButton:last-child {
+  margin-bottom: 0;
+}
+
+.questionButton:hover {
+  background-color: #e91e63; /* Fondo rosado al pasar el mouse */
+  color: white;
+}
