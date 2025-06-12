@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom'; // Importa Link para la navegación
 import styles from './Header.module.css'; // Importa los estilos del Header
 // Importa los iconos que necesites para los enlaces de navegación
-import { FaHome, FaCalendarAlt, FaSignInAlt, FaHeart } from 'react-icons/fa'; // Ejemplo de iconos
+import { FaHome, FaCalendarAlt, FaSignInAlt, FaHeart, FaShoppingCart } from 'react-icons/fa'; // Ejemplo de iconos
 
 const Header: React.FC = () => {
   return (
@@ -28,6 +28,11 @@ const Header: React.FC = () => {
         {/* Puedes estilizar este Link para que parezca un botón si quieres */}
         <Link to="/login" className={styles.navLink}> {/* Apunta a la ruta /login */}
            <FaSignInAlt className={styles.navIcon} /> Iniciar Sesión
+        </Link>
+        {/* Enlace a la página de Carrito */}
+        {/* Puedes estilizar este Link para que parezca un botón si quieres */}
+        <Link to="/cart" className={styles.navLink}> {/* Apunta a la ruta /cart */}
+           <FaShoppingCart className={styles.navIcon} /> Carrito de Reservas
         </Link>
       </nav>
     </header>

@@ -10,9 +10,14 @@ import LoginPage from './components/LoginPage/LoginPage.tsx';
 import AdminDashboard from './components/AdminDashboard/AdminDashboard.tsx';
 import ProfessionalManagement from './components/ProfessionalManagement/ProfessionalManagement.tsx';
 import ServiceManagement from './components/ServiceManagement/ServiceManagement.tsx';
-import AppointmentManagement from './components/AppointmentManagement/AppointmentManagement.tsx'; // Importa el componente AppointmentManagement
+import AppointmentManagement from './components/AppointmentManagement/AppointmentManagement.tsx';
 import ProfessionalDashboard from './components/ProfessionalDashboard/ProfessionalDashboard.tsx';
 import MyAppointments from './components/MyAppointments/MyAppointments.tsx';
+
+// --- PASO CLAVE 1: Importa el CartProvider y CartPage ---
+import { CartProvider } from './components/Cart/CartContext.tsx';
+import CartPage from './components/Cart/CartPage.tsx'; // Importa la página del carrito
+
 
 // Importa los componentes de Layout y ProtectedRoute
 import Layout from './components/Layout/Layout.tsx';
@@ -42,8 +47,14 @@ const router = createBrowserRouter([
         path: "login",
         element: <LoginPage />,
       },
+      // --- PASO CLVE 2: Añade la ruta para la página del carrito ---
+      {
+        path: "cart",
+        element: <CartPage />,
+      },
     ],
   },
+  
   {
     // Ruta para el dashboard de ADMINISTRADOR y sus sub-rutas, PROTEGIDA con rol 'admin'
     path: "/admin",
@@ -92,9 +103,12 @@ const router = createBrowserRouter([
 // --- Fin Configuración del Router ---
 
 
-// --- Renderizado de la Aplicación ---
+// --- PASO CLAVE 3: Renderizado de la Aplicación envolviendo RouterProvider con CartProvider ---
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    {/* Envuelve RouterProvider con CartProvider para que el contexto esté disponible globalmente */}
+    <CartProvider>
+      <RouterProvider router={router} />
+    </CartProvider>
   </React.StrictMode>,
 );

@@ -1,1 +1,484 @@
-@import 'react-datepicker/dist/react-datepicker.css';.bookingPageContainer{max-width:800px;margin:40px auto;padding:20px;background-color:#ffffff;border-radius:8px;box-shadow:0 4px 10px rgba(0,0,0,0.1);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#333;line-height:1.6;}.pageTitle{font-size:2rem;color:#1a2a4d;text-align:center;margin-bottom:30px;border-bottom:1px solid #eee;padding-bottom:15px;}.stepContainer{margin-bottom:40px;}.stepIndicator{display:flex;align-items:center;gap:10px;margin-bottom:20px;color:#555;border-bottom:1px solid #eee;padding-bottom:10px;flex-wrap:wrap;}.stepIcon{font-size:1.5rem;color:#1a2a4d;flex-shrink:0;}.stepIconCompleted{color:#d81b60;}.stepTitle{font-size:1.3rem;font-weight:600;color:#333;margin:0;}.selectedServiceName{font-size:1rem;font-weight:normal;color:#555;margin-left:5px;}.servicesGallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:20px;}.serviceCard{background-color:#fff5f7;border-radius:8px;padding:15px;box-shadow:0 1px 4px rgba(0,0,0,0.08);cursor:pointer;transition:transform 0.2s ease-in-out,box-shadow 0.2s ease-in-out,border-color 0.2s ease-in-out,background-color 0.2s ease-in-out;border:2px solid transparent;position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;height:280px;overflow:hidden;}.serviceCard.selected{border-color:#e91e63;box-shadow:0 2px 6px rgba(0,0,0,0.12);background-color:#ffe0e6;}.serviceCard:hover:not(.selected){transform:translateY(-3px);box-shadow:0 3px 7px rgba(0,0,0,0.15);}.serviceImage{width:100%;height:120px;object-fit:cover;border-radius:6px 6px 0 0;margin-bottom:10px;}.serviceIcon{font-size:2rem;color:#1a2a4d;margin-bottom:10px;}.serviceName{font-size:1.1rem;font-weight:600;color:#1a2a4d;margin:0 0 10px 0;word-break:break-word;white-space:normal;}.serviceInfo{display:flex;flex-direction:column;gap:5px;font-size:0.9rem;color:#555;margin-top:auto;}.infoIcon{font-size:1rem;color:#d81b60;}.selectedIndicator{position:absolute;top:10px;right:10px;font-size:1.8rem;color:#d81b60;background-color:rgba(255,255,255,0.8);border-radius:50%;width:30px;height:30px;display:flex;justify-content:center;align-items:center;}.checkIcon{}.professionalSelectionContainer{margin-bottom:20px;}.dateSelectionContainer{margin-bottom:20px;}.dateLabel{display:block;font-size:1rem;font-weight:600;color:#555;margin-bottom:5px;}.dateInput{width:100%;padding:10px;border:1px solid #ccc;border-radius:4px;font-size:1rem;box-sizing:border-box;background-color:white;color:#555;text-align:left;cursor:pointer;}.dateInput:focus{border-color:#e91e63;outline:none;box-shadow:0 0 0 0.2rem rgba(233,30,99,0.25);}.timeSelectionContainer{margin-bottom:20px;}.timesTitle{font-size:1.1rem;font-weight:600;color:#555;margin-bottom:10px;}.timeSlotsGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:10px;}.timeSlotButton{padding:8px 5px;font-size:0.9rem;font-weight:600;border:1px solid #ccc;border-radius:4px;cursor:pointer;background-color:#eee;color:#333;transition:background-color 0.2s ease-in-out,border-color 0.2s ease-in-out;text-align:center;}.timeSlotButton:hover:not(:disabled){background-color:#ddd;border-color:#bbb;}.timeSlotButton.selectedTime{background-color:#e91e63;color:white;border-color:#e91e63;}.timeSlotButton:disabled{opacity:0.5;cursor:not-allowed;text-decoration:line-through;}.authContainer{margin-bottom:20px;padding:20px;background-color:#fdebf2;border-radius:8px;border:1px solid #ffcdd2;text-align:center;}.authPrompt{font-size:1.1rem;color:#1a2a4d;margin-bottom:15px;font-weight:600;}.authForm{display:flex;flex-direction:column;gap:15px;max-width:400px;margin:0 auto 15px auto;}.authButtons{display:flex;gap:10px;justify-content:center;margin-top:10px;}.authButton{padding:10px 20px;font-size:1rem;font-weight:600;border:none;border-radius:5px;cursor:pointer;transition:background-color 0.2s ease-in-out,opacity 0.2s ease-in-out;}.authButton{background-color:#e91e63;color:white;}.authButton:hover:not(:disabled){background-color:#d81b60;}.signupButton{background-color:#1a2a4d;color:white;}.signupButton:hover:not(:disabled){background-color:#2a3a5d;}.authButton:disabled{opacity:0.6;cursor:not-allowed;}.continueWithoutLogin{font-size:0.95rem;color:#555;margin-top:15px;}.linkButton{background:none;border:none;padding:0;font-size:0.95rem;color:#e91e63;text-decoration:underline;cursor:pointer;transition:color 0.2s ease-in-out;}.linkButton:hover{color:#d81b60;}.authMessage{text-align:center;font-size:1rem;margin-bottom:15px;padding:10px;border-radius:4px;background-color:#ffe0e6;color:#1a2a4d;border:1px solid #ffcdd2;}.loggedInMessage{text-align:center;font-size:1.1rem;color:#155724;margin:20px 0;padding:15px;background-color:#d4edda;border:1px solid #c3e6cb;border-radius:4px;}.formDataContainer{display:flex;flex-direction:column;gap:15px;}.formField{margin-bottom:0;}.formLabel{display:block;font-size:1rem;font-weight:600;color:#555;margin-bottom:5px;}.formInput,.formTextArea{width:100%;padding:10px;border:1px solid #ccc;border-radius:4px;font-size:1rem;box-sizing:border-box;color:#555;background-color:white;}.formInput:focus,.formTextArea:focus{border-color:#e91e63;outline:none;box-shadow:0 0 0 0.2rem rgba(233,30,99,0.25);}.formTextArea{resize:vertical;min-height:80px;}.bookingSummary{margin-top:20px;padding:15px;background-color:#fff5f7;border-radius:8px;border:1px dashed #ffcdd2;}.summaryTitle{font-size:1.2rem;font-weight:600;color:#1a2a4d;margin-bottom:10px;border-bottom:1px solid #eee;padding-bottom:8px;}.summaryDetail{font-size:1rem;color:#555;margin-bottom:5px;}.summaryDetail strong{color:#333;}.bookingActions{margin-top:30px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;}.backButton{background-color:#ccc;color:#333;padding:12px 25px;font-size:1rem;font-weight:600;border:none;border-radius:5px;cursor:pointer;transition:background-color 0.2s ease-in-out;flex-grow:1;min-width:120px;}.backButton:hover{background-color:#bbb;}.nextButton.confirmButton{background-color:#e91e63;color:white;padding:12px 25px;font-size:1rem;font-weight:600;border:none;border-radius:5px;cursor:pointer;transition:background-color 0.2s ease-in-out,opacity 0.2s ease-in-out;flex-grow:1;min-width:180px;}.nextButton.confirmButton:hover:not(:disabled){background-color:#d81b60;}.nextButton.confirmButton:disabled{opacity:0.6;cursor:not-allowed;}@media (max-width:767px){.bookingPageContainer{padding:15px;margin:20px auto;}.pageTitle{font-size:1.8rem;}.stepIndicator{flex-direction:column;align-items:flex-start;gap:5px;}.stepIcon{font-size:1.3rem;}.stepTitle{font-size:1.1rem;}.selectedServiceName{font-size:0.9rem;margin-left:0;margin-top:5px;}.servicesGallery{grid-template-columns:1fr;}.serviceCard{height:auto;padding:10px;flex-direction:row;align-items:center;text-align:left;gap:10px;}.serviceCard>div:first-child{display:flex;align-items:center;gap:10px;flex-grow:1;}.serviceIcon{font-size:1.5rem;margin-bottom:0;}.serviceName{font-size:1rem;margin:0;}.serviceInfo{flex-direction:row;gap:10px;flex-shrink:0;}.serviceDetail{display:flex;align-items:center;gap:3px;white-space:nowrap;}.infoIcon{font-size:0.9rem;}.selectedIndicator{font-size:1.5rem;width:25px;height:25px;top:5px;right:5px;}.authContainer{padding:15px;}.authPrompt{font-size:1rem;}.authForm{max-width:100%;gap:10px;}.authButtons{flex-direction:column;gap:10px;}.authButton{width:100%;text-align:center;}.continueWithoutLogin{font-size:0.9rem;}.linkButton{font-size:0.9rem;}.authMessage,.loggedInMessage{font-size:0.95rem;padding:8px;}.formDataContainer{gap:10px;}.formLabel{font-size:0.95rem;}.formInput,.formTextArea{padding:8px;font-size:0.95rem;}.formTextArea{min-height:60px;}.bookingSummary{padding:10px;}.summaryTitle{font-size:1.1rem;}.summaryDetail{font-size:0.95rem;}.bookingActions{flex-direction:column;gap:15px;}.backButton,.nextButton.confirmButton{width:100%;text-align:center;padding:10px 20px;font-size:1rem;}}
+@import 'react-datepicker/dist/react-datepicker.css';
+
+.bookingPageContainer {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #333;
+    line-height: 1.6;
+}
+
+.pageTitle {
+    font-size: 2rem;
+    color: #1a2a4d;
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.stepContainer {
+    margin-bottom: 40px;
+}
+
+.stepIndicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    color: #555;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.stepIcon {
+    font-size: 1.5rem;
+    color: #1a2a4d;
+    flex-shrink: 0;
+}
+
+.stepIconCompleted {
+    color: #d81b60;
+}
+
+.stepTitle {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.selectedServiceName { /* Usado como .selectedName en JS */
+    font-size: 1rem;
+    font-weight: normal;
+    color: #555;
+    margin-left: 5px;
+}
+
+/* --- NUEVOS ESTILOS PARA MENSAJES DE ESTADO --- */
+.statusMessage {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 500;
+    animation: slideIn 0.3s ease-out; /* Animación simple */
+}
+
+.errorMessage {
+    background-color: #ffe0e6; /* Base de color rosa */
+    color: #d81b60; /* Color de texto como tu color principal */
+    border: 1px solid #ffcdd2;
+}
+
+.successMessage {
+    background-color: #d4edda; /* Un verde suave */
+    color: #155724; /* Un verde oscuro */
+    border: 1px solid #c3e6cb;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Servicios Gallery --- */
+.servicesGallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+}
+
+.serviceCard {
+    background-color: #fff5f7;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+    border: 2px solid transparent;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    height: 280px;
+    overflow: hidden;
+}
+
+.serviceCard.selected {
+    border-color: #e91e63;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    background-color: #ffe0e6;
+}
+
+.serviceCard:hover:not(.selected) {
+    transform: translateY(-3px);
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.15);
+}
+
+.serviceImage {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px 6px 0 0;
+    margin-bottom: 10px;
+}
+
+.serviceIcon {
+    font-size: 2rem;
+    color: #1a2a4d;
+    margin-bottom: 10px;
+}
+
+.serviceName {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a2a4d;
+    margin: 0 0 10px 0;
+    word-break: break-word;
+    white-space: normal;
+}
+
+.serviceInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: auto;
+}
+
+.infoIcon {
+    font-size: 1rem;
+    color: #d81b60;
+}
+
+.selectedIndicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.8rem;
+    color: #d81b60;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.checkIcon { /* No hay estilos directos aquí, toma del padre */ }
+
+/* --- Selectores de Profesional, Fecha y Hora --- */
+.professionalSelectionContainer,
+.dateSelectionContainer,
+.timeSelectionContainer {
+    margin-bottom: 20px;
+}
+
+.dateLabel { /* Usado como .label en JS */
+    display: block;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.dateInput { /* Usado como .select y .datePickerInput en JS */
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    background-color: white;
+    color: #555;
+    text-align: left;
+    cursor: pointer;
+    /* Estilos para el select nativo */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%231a2a4d" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); /* Flecha SVG adaptada a tu color */
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 1.2em;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dateInput:focus {
+    border-color: #e91e63;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(233, 30, 99, 0.25);
+}
+
+.dateInput:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.timesTitle {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.timeSlotsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+}
+
+.timeSlotButton {
+    padding: 8px 5px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #eee;
+    color: #333;
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+    text-align: center;
+}
+
+.timeSlotButton:hover:not(:disabled) {
+    background-color: #ddd;
+    border-color: #bbb;
+}
+
+.timeSlotButton.selectedTime {
+    background-color: #e91e63;
+    color: white;
+    border-color: #e91e63;
+}
+
+.timeSlotButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+/* REMOVIDOS COMPLETAMENTE: authContainer, authPrompt, authForm, authButtons, authButton, signupButton,
+   continueWithoutLogin, linkButton, authMessage, loggedInMessage, formDataContainer,
+   formField, formLabel, formInput, formTextArea, bookingSummary, summaryTitle, summaryDetail */
+
+.bookingActions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.backButton {
+    background-color: #ccc;
+    color: #333;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    flex-grow: 1;
+    min-width: 120px;
+}
+
+.backButton:hover {
+    background-color: #bbb;
+}
+
+/* --- NUEVOS ESTILOS PARA BOTONES DE CARRITO --- */
+.addToCartButton,
+.goToCartButton {
+    padding: 12px 25px; /* Mismo padding que backButton y confirmButton */
+    font-size: 1rem;     /* Mismo tamaño de fuente */
+    font-weight: 600;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+    flex-grow: 1;
+    min-width: 180px; /* Ancho similar al confirmButton */
+    display: flex; /* Para alinear el icono y el texto */
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Espacio entre icono y texto */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Sombra consistente */
+}
+
+.addToCartButton {
+    background-color: #1a2a4d; /* Tu color azul oscuro/púrpura */
+    color: white;
+}
+
+.addToCartButton:hover:not(:disabled) {
+    background-color: #2a3a5d; /* Un tono más oscuro en hover */
+    transform: translateY(-2px); /* Ligero efecto de elevación */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.addToCartButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.goToCartButton {
+    background-color: #e91e63; /* Tu color rosa/rojo principal */
+    color: white;
+}
+
+.goToCartButton:hover:not(:disabled) {
+    background-color: #d81b60; /* Un tono más oscuro en hover */
+    transform: translateY(-2px); /* Ligero efecto de elevación */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.goToCartButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.buttonIcon { /* Estilo para los iconos dentro de los botones */
+    font-size: 1.1rem;
+}
+
+
+/* RESPONSIVE */
+@media (max-width: 767px) {
+    .bookingPageContainer {
+        padding: 15px;
+        margin: 20px auto;
+    }
+
+    .pageTitle {
+        font-size: 1.8rem;
+    }
+
+    .stepIndicator {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .stepIcon {
+        font-size: 1.3rem;
+    }
+
+    .stepTitle {
+        font-size: 1.1rem;
+    }
+
+    .selectedServiceName { /* Usado como .selectedName en JS */
+        font-size: 0.9rem;
+        margin-left: 0;
+        margin-top: 5px;
+    }
+
+    .servicesGallery {
+        grid-template-columns: 1fr;
+    }
+
+    .serviceCard {
+        height: auto;
+        padding: 10px;
+        flex-direction: row;
+        align-items: center;
+        text-align: left;
+        gap: 10px;
+    }
+
+    .serviceCard>div:first-child { /* Ajuste para el contenido dentro de la tarjeta */
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-grow: 1;
+    }
+
+    .serviceImage { /* Reajustar tamaño de imagen en mobile */
+        width: 80px;
+        height: 80px;
+        border-radius: 4px;
+        margin-bottom: 0;
+    }
+
+    .serviceIcon {
+        font-size: 1.5rem;
+        margin-bottom: 0;
+    }
+
+    .serviceName {
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .serviceInfo {
+        flex-direction: row; /* Volver a fila para duración y precio */
+        justify-content: space-between;
+        width: 100%; /* Ocupar todo el ancho */
+        margin-top: 0;
+        gap: 5px;
+    }
+
+    .serviceDetail {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        white-space: nowrap;
+    }
+
+    .infoIcon {
+        font-size: 0.9rem;
+    }
+
+    .selectedIndicator {
+        font-size: 1.5rem;
+        width: 25px;
+        height: 25px;
+        top: 5px;
+        right: 5px;
+    }
+
+    /* Selectores de Profesional, Fecha y Hora */
+    .dateLabel {
+        font-size: 0.95rem;
+    }
+    .dateInput {
+        padding: 8px;
+        font-size: 0.95rem;
+    }
+    .timesTitle {
+        font-size: 1rem;
+    }
+    .timeSlotButton {
+        padding: 6px 4px;
+        font-size: 0.85rem;
+    }
+
+    .bookingActions {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .backButton,
+    .addToCartButton,
+    .goToCartButton {
+        width: 100%;
+        text-align: center;
+        padding: 10px 20px;
+        font-size: 1rem;
+        min-width: unset; /* Quitar min-width en mobile */
+    }
+}

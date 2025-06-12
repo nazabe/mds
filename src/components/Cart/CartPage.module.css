@@ -1,0 +1,321 @@
+/* src/components/Cart/CartPage.module.css */
+
+.cartPageContainer {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #333;
+    line-height: 1.6;
+}
+
+.pageTitle {
+    font-size: 2rem;
+    color: #1a2a4d;
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.emptyCartMessage {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #555;
+    padding: 30px 0;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px dashed #ccc;
+}
+
+.cartItemsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.cartItem {
+    display: flex;
+    align-items: center;
+    background-color: #fff5f7; /* Fondo suave como serviceCard */
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    transition: box-shadow 0.2s ease-in-out;
+    position: relative; /* Para el botón de eliminar */
+    flex-wrap: wrap; /* Permitir que los elementos se envuelvan en pantallas pequeñas */
+}
+
+.cartItem:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.itemInfo {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding-right: 15px; /* Espacio antes de los controles */
+}
+
+.itemName {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a2a4d;
+    margin-bottom: 5px;
+}
+
+.itemDetail {
+    font-size: 0.95rem;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.itemDetail strong {
+    color: #333;
+}
+
+.infoIcon {
+    color: #d81b60; /* Color de icono consistente con BookingPage */
+    font-size: 1rem;
+}
+
+.itemActions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0; /* Evita que se encoja */
+    margin-left: auto; /* Empuja los controles a la derecha */
+}
+
+.quantityControl {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    overflow: hidden; /* Para que los bordes de los botones se vean bien */
+}
+
+.quantityButton {
+    background-color: #eee;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    transition: background-color 0.2s ease;
+}
+
+.quantityButton:hover {
+    background-color: #ddd;
+}
+
+.quantityButton:active {
+    background-color: #ccc;
+}
+
+.quantityButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #f0f0f0;
+}
+
+.itemQuantity {
+    padding: 8px 10px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a2a4d;
+    min-width: 30px; /* Asegura un ancho mínimo */
+    background-color: #ffffff;
+}
+
+.removeButton {
+    background: none;
+    border: none;
+    color: #d81b60; /* Color de la X consistente con tus acentos */
+    font-size: 1.5rem; /* Icono más grande */
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.2s ease;
+    padding: 5px; /* Área de click */
+    position: absolute; /* Para colocarlo en la esquina superior derecha */
+    top: 5px;
+    right: 5px;
+}
+
+.removeButton:hover {
+    color: #e91e63;
+    transform: scale(1.1);
+}
+
+.cartSummary {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #fdebf2; /* Fondo similar al authContainer */
+    border-radius: 8px;
+    border: 1px solid #ffcdd2; /* Borde similar al authContainer */
+    text-align: right;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1a2a4d;
+    display: flex;
+    justify-content: space-between; /* Para alinear el texto de total y el valor */
+    align-items: center;
+    flex-wrap: wrap; /* Permitir que se envuelva en mobile */
+    gap: 10px;
+}
+
+.summaryTotal {
+    flex-grow: 1;
+    text-align: left;
+}
+
+.totalAmount {
+    color: #e91e63; /* Color de acento para el total */
+    font-size: 1.5rem; /* Más grande para destacar */
+}
+
+.cartActions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* Botones de acción del carrito, replicando los estilos de BookingPage */
+.continueShoppingButton,
+.checkoutButton,
+.clearCartButton {
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+    flex-grow: 1;
+    min-width: 150px; /* Ancho mínimo para que se vean bien */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.continueShoppingButton {
+    background-color: #1a2a4d; /* Azul oscuro/púrpura */
+    color: white;
+}
+
+.continueShoppingButton:hover:not(:disabled) {
+    background-color: #2a3a5d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.checkoutButton {
+    background-color: #e91e63; /* Rosa/rojo principal */
+    color: white;
+}
+
+.checkoutButton:hover:not(:disabled) {
+    background-color: #d81b60;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.clearCartButton {
+    background-color: #ccc; /* Gris para "Limpiar Carrito" */
+    color: #333;
+}
+
+.clearCartButton:hover:not(:disabled) {
+    background-color: #bbb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.continueShoppingButton:disabled,
+.checkoutButton:disabled,
+.clearCartButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.buttonIcon {
+    font-size: 1.1rem;
+}
+
+
+/* RESPONSIVE */
+@media (max-width: 767px) {
+    .cartPageContainer {
+        padding: 15px;
+        margin: 20px auto;
+    }
+
+    .pageTitle {
+        font-size: 1.8rem;
+    }
+
+    .cartItem {
+        flex-direction: column; /* Apilar elementos en mobile */
+        align-items: flex-start;
+        padding-bottom: 40px; /* Espacio para el botón de eliminar posicionado absolutamente */
+    }
+
+    .itemInfo {
+        padding-right: 0;
+        margin-bottom: 10px; /* Espacio entre info y acciones en mobile */
+        width: 100%;
+    }
+
+    .itemActions {
+        width: 100%;
+        justify-content: flex-end; /* Alinear a la derecha en mobile */
+        margin-left: 0;
+    }
+
+    .removeButton {
+        top: auto; /* Resetear top */
+        bottom: 5px; /* Posicionarlo en la parte inferior derecha */
+        right: 5px;
+        font-size: 1.3rem; /* Ligeramente más pequeño para mobile */
+    }
+
+    .cartSummary {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .summaryTotal {
+        width: 100%;
+        text-align: left;
+    }
+
+    .cartActions {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .continueShoppingButton,
+    .checkoutButton,
+    .clearCartButton {
+        width: 100%;
+        text-align: center;
+        padding: 10px 20px;
+        font-size: 1rem;
+        min-width: unset;
+    }
+}
