@@ -161,7 +161,6 @@ const ServiceManagement: React.FC = () => {
         )
       );
       setEditingService(null);
-      setMessage('Cambios guardados localmente (simulación). Implementar API para persistir.');
       // Si la API actualiza y devuelve el objeto actualizado, o simplemente confirma:
       setIsLoading(true);
       try {
@@ -219,11 +218,33 @@ const ServiceManagement: React.FC = () => {
     }
   };
 
+  {/* const loadedServices: Service[] = [
+      // Servicios Individuales - Masajes
+      { id: 'service-1', name: "Masaje Anti-stress", description: "Masaje relajante para liberar tensiones.", price: 12000, durationMinutes: 50, imageUrl: "/mds/images/services/massage-3795693_1280.jpg" },
+      { id: 'service-2', name: "Masaje Descontracturante", description: "Alivia nudos y tensiones musculares profundas.", price: 13000, durationMinutes: 60, imageUrl: "/mds/images/services/massage-2768832_1280.jpg" },
+      { id: 'service-3', name: "Masaje con Piedras Calientes", description: "Terapia relajante con piedras volcánicas calientes.", price: 15000, durationMinutes: 70, imageUrl: "/mds/images/services/m_116_1677502402.jpg" },
+      { id: 'service-4', name: "Masaje Circulatorio", description: "Mejora la circulación y reduce la retención de líquidos.", price: 11000, durationMinutes: 45, imageUrl: "/mds/images/services/people-3184615_1280.jpg" },
+
+      // Servicios Individuales - Belleza
+      { id: 'service-5', name: "Lifting de Pestaña", description: "Realza tus pestañas de forma natural y duradera.", price: 8500, durationMinutes: 50, imageUrl: "/mds/images/services/woman-567021_1280.jpg" },
+      { id: 'service-6', name: "Depilación Facial", description: "Eliminación de vello facial con métodos suaves.", price: 4000, durationMinutes: 25, imageUrl: "/mds/images/services/beautiful-young-woman-facial-treatment-beauty-salon-applying-cream_219728-3075.avif" },
+      { id: 'service-7', name: "Belleza de Manos y Pies", description: "Manicura y pedicura completas para un cuidado total.", price: 10000, durationMinutes: 90, imageUrl: "/mds/images/services/physical-therapy-2133286_1280.jpg" },
+
+      // Servicios Individuales - Tratamientos Faciales
+      { id: 'service-8', name: "Punta de Diamante Microexfoliación", description: "Exfoliación profunda para renovar la piel del rostro.", price: 9500, durationMinutes: 60, imageUrl: "/mds/images/services/831TreatmentShoot_Derma_0204.jpg" },
+      { id: 'service-9', name: "Limpieza Profunda + Hidratación", description: "Elimina impurezas y nutre la piel del rostro.", price: 11000, durationMinutes: 70, imageUrl: "/mds/images/services/face-2722810_1280.jpg" },
+      { id: 'service-10', name: "Crio Frecuencia Facial", description: "Reafirma y revitaliza la piel con frío y calor controlado.", price: 9000, durationMinutes: 40, imageUrl: "/mds/images/services/conoce-todo-sobre-la-radio-frecuencia-facial.jpg" },
+
+      // Servicios Individuales - Tratamientos Corporales
+      { id: 'service-11', name: "VelaSlim", description: "Tratamiento para reducir celulitis y modelar el cuerpo.", price: 10500, durationMinutes: 45, imageUrl: "/mds/images/services/facial-8224799_1280.jpg" },
+      { id: 'service-12', name: "DermoHealth", description: "Mejora la elasticidad de la piel y reduce la flacidez.", price: 9000, durationMinutes: 40, imageUrl: "/mds/images/services/ai-generated-8270432_1280.jpg" },
+      { id: 'service-13', name: "Criofrecuencia Corporal", description: "Tratamiento reafirmante y reductor de grasa corporal.", price: 12000, durationMinutes: 60, imageUrl: "https://placehold.co/180x120/fdebf2/1a2a4d?text=Criofrecuencia+Corporal" },
+      { id: 'service-14', name: "Ultracavitación", description: "Reduce la grasa localizada mediante ultrasonidos.", price: 11500, durationMinutes: 50, imageUrl: "https://placehold.co/180x120/fdebf2/1a2a4d?text=Ultracavitacion" },
+    ]; */}
+
   return (
     <div className={styles.serviceManagementContainer}>
       <h1 className={styles.title}>Gestión de Servicios</h1>
-
-      {isLoading && <div className={styles.loading}>Cargando...</div>}
       {message && <div className={`${styles.message} ${message.toLowerCase().includes('error') ? styles.errorMessage : styles.successMessage}`}>{message}</div>}
 
 
@@ -238,15 +259,6 @@ const ServiceManagement: React.FC = () => {
             value={newService.name}
             onChange={handleNewServiceChange}
             className={styles.inputField}
-            disabled={isLoading}
-          />
-          <textarea
-            name="description"
-            placeholder="Descripción del Servicio (local)"
-            value={newService.description}
-            onChange={handleNewServiceChange}
-            className={styles.textareaField}
-            rows={3}
             disabled={isLoading}
           />
           <input
@@ -278,6 +290,15 @@ const ServiceManagement: React.FC = () => {
             className={styles.inputField}
             disabled={isLoading}
           />
+          <textarea
+            name="description"
+            placeholder="Descripción del Servicio (local)"
+            value={newService.description}
+            onChange={handleNewServiceChange}
+            className={styles.textareaField}
+            rows={3}
+            disabled={isLoading}
+          />
           <button onClick={handleAddService} className={styles.addButton} disabled={isLoading}>
             <FaPlus /> Añadir Servicio
           </button>
@@ -287,6 +308,7 @@ const ServiceManagement: React.FC = () => {
       {/* Lista de servicios existentes */}
       <div className={styles.servicesListSection}>
         <h2 className={styles.sectionTitle}>Servicios Existentes</h2>
+        {isLoading && <div className={styles.loading}>Cargando...</div>}
         {services.length === 0 && !isLoading ? (
           <p>No hay servicios registrados.</p>
         ) : (
