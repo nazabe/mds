@@ -1,278 +1,299 @@
 // src/components/AppointmentManagement/AppointmentManagement.tsx
 import React, { useState, useEffect } from 'react';
 import styles from './AppointmentManagement.module.css';
-import { FaPlus, FaEdit, FaTrash, FaSave, FaTimes } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaSave, FaTimes, FaSpinner } from 'react-icons/fa';
 
-// Interfaz para un Servicio (usaremos la misma estructura que ya tienes)
+// URL base de tu API
+const API_BASE_URL = 'https://web-spa-hjzu.onrender.com';
+
+// --- INTERFACES ALINEADAS CON LA API ---
+
+// Interfaz para un Servicio (según /listaServicio)
 interface Service {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  durationMinutes: number;
-  imageUrl?: string;
+  id: number;
+  nombre: string;
+  precio: number;
+  tiempo: number;
 }
 
-// Interfaz para un Profesional (usaremos la misma estructura que ya tienes)
+// Interfaz para un Profesional (se mantiene como mock por falta de endpoint)
 interface Professional {
-  id: string;
+  id: string; // Se mantiene como string para el mock
   name: string;
   specialty: string;
-  email: string;
-  phone: string;
 }
 
-// Interfaz para un Turno
-interface Appointment {
-  id: string;
-  clientId: string; // ID del cliente que reserva (simulado por ahora)
-  clientName: string;
-  clientEmail: string;
-  clientPhone: string;
-  serviceId: string;
-  professionalId: string;
-  date: string; // Formato "YYYY-MM-DD"
-  time: string; // Formato "HH:MM"
-  notes?: string;
+// Interfaz para un Turno (basado en los endpoints de turnos)
+interface Turno {
+  id: number;
+  solicitante: { id: number; nombre: string; apellido: string, email: string }; // Asumiendo que la API devuelve el objeto solicitante
+  profesional: { id: number; nombre: string; apellido: string }; // Asumiendo que la API devuelve el objeto profesional
+  servicios: Service[];
+  fecha: string; // Formato "YYYY-MM-DD"
+  hora: string; // Formato "HH:MM"
+  estado: string;
+  notas?: string;
 }
+
+// Tipos de estado de turno para el dropdown de actualización
+const ESTADOS_TURNO = ["PENDIENTE", "EN_PROCESO", "FINALIZADO", "CANCELADO", "PENDIENTE_PAGO"];
 
 const AppointmentManagement: React.FC = () => {
-  // Estado para la lista de turnos
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  // Estado para el turno que se está editando (o null si no se edita ninguno)
-  const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
-  // Estado para los datos del nuevo turno
-  const [newAppointment, setNewAppointment] = useState<Omit<Appointment, 'id'>>({
-    clientId: 'client-1', // ID de cliente simulado
-    clientName: '',
-    clientEmail: '',
-    clientPhone: '',
-    serviceId: '',
-    professionalId: '',
-    date: '',
-    time: '',
-    notes: ''
+  // --- ESTADOS DEL COMPONENTE ---
+  const [turnos, setTurnos] = useState<Turno[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
+  const [editingTurno, setEditingTurno] = useState<Turno | null>(null);
+  const [newTurno, setNewTurno] = useState({
+    solicitanteId: 1, // ID de cliente fijo para el ejemplo, deberías obtenerlo del usuario logueado
+    profesionalId: '',
+    serviciosIds: [] as number[],
+    fecha: '',
+    hora: '',
+    notas: ''
   });
-  // Estado para manejar mensajes de error o éxito
-  const [message, setMessage] = useState<string | null>(null);
+  
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState<{ text: string, type: 'success' | 'error' } | null>(null);
 
-  // Datos simulados para selectores de servicios y profesionales
-  // En una aplicación real, estos se cargarían de sus respectivas gestiones o APIs
-  const mockServices: Service[] = [
-    { id: 'service-1', name: "Masaje Anti-stress", description: "", price: 0, durationMinutes: 0 },
-    { id: 'service-2', name: "Masaje Descontracturante", description: "", price: 0, durationMinutes: 0 },
-    { id: 'service-5', name: "Lifting de Pestaña", description: "", price: 0, durationMinutes: 0 },
-    { id: 'service-8', name: "Punta de Diamante Microexfoliación", description: "", price: 0, durationMinutes: 0 },
-    { id: 'service-11', name: "VelaSlim", description: "", price: 0, durationMinutes: 0 },
-  ];
-
+  // --- DATOS MOCK (SOLO PARA PROFESIONALES) ---
+  // TODO: Reemplazar con una llamada a la API cuando el endpoint de profesionales esté disponible
   const mockProfessionals: Professional[] = [
-    { id: 'prof-1', name: 'Dra. Ana Felicidad', specialty: 'Masajes y Faciales', email: '', phone: '' },
-    { id: 'prof-2', name: 'Dra. López', specialty: 'Medicina Estética', email: '', phone: '' },
-    { id: 'prof-3', name: 'Dr. García', specialty: 'Dermatología', email: '', phone: '' },
-    { id: 'prof-4', name: 'Lic. Pérez', specialty: 'Nutrición', email: '', phone: '' },
+    { id: '1', name: 'Dra. Ana Felicidad', specialty: 'Masajes y Faciales' },
+    { id: '2', name: 'Dra. López', specialty: 'Medicina Estética' },
+    { id: '3', name: 'Dr. García', specialty: 'Dermatología' },
+    { id: '4', name: 'Lic. Pérez', specialty: 'Nutrición' },
   ];
 
-  // Simulación de carga inicial de turnos
+  // --- EFECTO PARA CARGAR DATOS INICIALES ---
   useEffect(() => {
-    const loadedAppointments: Appointment[] = [
-      {
-        id: 'appt-1',
-        clientId: 'client-101',
-        clientName: 'María García',
-        clientEmail: 'maria.g@example.com',
-        clientPhone: '3624112233',
-        serviceId: 'service-1',
-        professionalId: 'prof-1',
-        date: '2025-05-25',
-        time: '10:00',
-        notes: 'Cliente habitual'
-      },
-      {
-        id: 'appt-2',
-        clientId: 'client-102',
-        clientName: 'Carlos Ruiz',
-        clientEmail: 'carlos.r@example.com',
-        clientPhone: '3624445566',
-        serviceId: 'service-5',
-        professionalId: 'prof-2',
-        date: '2025-05-26',
-        time: '14:30',
-        notes: ''
-      },
-    ];
-    setAppointments(loadedAppointments);
+    const fetchData = async () => {
+      setLoading(true);
+      setMessage(null);
+      try {
+        // Cargar servicios y turnos pendientes en paralelo
+        const [servicesRes, turnosRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/listaServicio`),
+          fetch(`${API_BASE_URL}/listTurnPendiente`)
+        ]);
+
+        if (!servicesRes.ok || !turnosRes.ok) {
+          throw new Error('Error al cargar los datos iniciales.');
+        }
+
+        const servicesData: Service[] = await servicesRes.json();
+        const turnosData: Turno[] = await turnosRes.json();
+        
+        setServices(servicesData);
+        setTurnos(turnosData);
+
+      } catch (error) {
+        console.error(error);
+        setMessage({ text: 'No se pudieron cargar los datos. Inténtalo de nuevo.', type: 'error' });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  // Función auxiliar para obtener el nombre del servicio por su ID
-  const getServiceName = (serviceId: string) => {
-    const service = mockServices.find(s => s.id === serviceId);
-    return service ? service.name : 'Servicio Desconocido';
-  };
-
-  // Función auxiliar para obtener el nombre del profesional por su ID
-  const getProfessionalName = (professionalId: string) => {
-    const professional = mockProfessionals.find(p => p.id === professionalId);
-    return professional ? professional.name : 'Profesional Desconocido';
-  };
-
-  // Maneja el cambio en los campos del formulario de nuevo turno
-  const handleNewAppointmentChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setNewAppointment(prev => ({ ...prev, [name]: value }));
-  };
-
-  // Maneja el cambio en los campos del formulario de edición
-  const handleEditingAppointmentChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    if (editingAppointment) {
-      setEditingAppointment(prev => (prev ? { ...prev, [name]: value } : null));
+  // Función para recargar la lista de turnos (útil después de crear o actualizar)
+  const fetchTurnos = async () => {
+    setLoading(true);
+    try {
+      // Por simplicidad, volvemos a cargar solo los pendientes. Podrías añadir un filtro para cambiar esto.
+      const response = await fetch(`${API_BASE_URL}/listTurnPendiente`);
+      if (!response.ok) throw new Error('Error al recargar los turnos.');
+      const data = await response.json();
+      setTurnos(data);
+    } catch (error) {
+      console.error(error);
+      setMessage({ text: 'No se pudieron actualizar los turnos.', type: 'error' });
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Añade un nuevo turno
-  const handleAddAppointment = () => {
-    if (!newAppointment.clientName || !newAppointment.serviceId || !newAppointment.professionalId || !newAppointment.date || !newAppointment.time) {
-      setMessage('Todos los campos obligatorios deben ser completados.');
+  // --- MANEJADORES DE EVENTOS ---
+
+  const handleNewTurnoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    if (name === "serviciosIds") {
+      // Manejar selección de servicio (asumiendo selección única por ahora)
+      setNewTurno(prev => ({ ...prev, [name]: [parseInt(value, 10)] }));
+    } else {
+      setNewTurno(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleEditingTurnoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    if (editingTurno) {
+      setEditingTurno(prev => (prev ? { ...prev, [name]: value } : null));
+    }
+  };
+
+  const handleAddTurno = async () => {
+    if (!newTurno.profesionalId || newTurno.serviciosIds.length === 0 || !newTurno.fecha || !newTurno.hora) {
+      setMessage({ text: 'Profesional, servicio, fecha y hora son obligatorios.', type: 'error' });
       return;
     }
-    const id = `appt-${Date.now()}`; // Genera un ID simple
-    const appointmentToAdd = { ...newAppointment, id };
-    setAppointments(prev => [...prev, appointmentToAdd]);
-    setNewAppointment({ // Limpia el formulario
-      clientId: 'client-1',
-      clientName: '',
-      clientEmail: '',
-      clientPhone: '',
-      serviceId: '',
-      professionalId: '',
-      date: '',
-      time: '',
-      notes: ''
-    });
-    setMessage('Turno añadido con éxito.');
-  };
+    
+    setMessage(null);
+    try {
+      const response = await fetch(`${API_BASE_URL}/solicitarTurno`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...newTurno,
+          profesionalId: parseInt(newTurno.profesionalId, 10), // La API espera un número
+        }),
+      });
 
-  // Inicia la edición de un turno
-  const handleEditClick = (appointment: Appointment) => {
-    setEditingAppointment({ ...appointment }); // Crea una copia para editar
-  };
-
-  // Guarda los cambios de un turno editado
-  const handleSaveEdit = () => {
-    if (editingAppointment) {
-      if (!editingAppointment.clientName || !editingAppointment.serviceId || !editingAppointment.professionalId || !editingAppointment.date || !editingAppointment.time) {
-        setMessage('Todos los campos obligatorios deben ser completados.');
-        return;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al solicitar el turno.');
       }
-      setAppointments(prev =>
-        prev.map(appt =>
-          appt.id === editingAppointment.id ? editingAppointment : appt
-        )
-      );
-      setEditingAppointment(null); // Sale del modo edición
-      setMessage('Cambios guardados con éxito.');
+
+      setMessage({ text: 'Turno añadido con éxito.', type: 'success' });
+      setNewTurno({ // Limpia el formulario
+        solicitanteId: 1,
+        profesionalId: '',
+        serviciosIds: [],
+        fecha: '',
+        hora: '',
+        notes: ''
+      });
+      fetchTurnos(); // Recarga la lista de turnos
+    } catch (error: any) {
+      setMessage({ text: error.message, type: 'error' });
     }
   };
 
-  // Cancela la edición
+  const handleEditClick = (turno: Turno) => {
+    setEditingTurno({ ...turno });
+  };
+  
+  const handleSaveEdit = () => {
+    // IMPORTANTE: No hay un endpoint para actualizar los detalles de un turno.
+    // Esta función solo guardará los cambios en el estado local de la página.
+    // Para persistir cambios, se necesitaría un endpoint `PUT /turno/{id}`.
+    if (editingTurno) {
+      setTurnos(prev =>
+        prev.map(t =>
+          t.id === editingTurno.id ? editingTurno : t
+        )
+      );
+      setEditingTurno(null);
+      setMessage({ text: 'Cambios guardados localmente (sin persistencia en servidor).', type: 'success' });
+    }
+  };
+
   const handleCancelEdit = () => {
-    setEditingAppointment(null);
+    setEditingTurno(null);
     setMessage(null);
   };
 
-  // Elimina un turno
-  const handleDeleteAppointment = (id: string) => {
+  const handleDeleteTurno = async (id: number) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este turno?')) {
-      setAppointments(prev => prev.filter(appt => appt.id !== id));
-      setMessage('Turno eliminado.');
+      try {
+        const response = await fetch(`${API_BASE_URL}/deleteTurn/${id}`, {
+          method: 'DELETE',
+        });
+        if (!response.ok) {
+          throw new Error('Error al eliminar el turno.');
+        }
+        setTurnos(prev => prev.filter(t => t.id !== id));
+        setMessage({ text: 'Turno eliminado con éxito.', type: 'success' });
+      } catch (error: any) {
+        setMessage({ text: error.message, type: 'error' });
+      }
     }
   };
+
+  const handleUpdateEstado = async (id: number, nuevoEstado: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/turno/${id}/estado?estado=${nuevoEstado}`, {
+        method: 'PUT', // o PATCH, dependiendo de tu API
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al actualizar el estado del turno.');
+      }
+      
+      // Actualizar el estado en la UI
+      setTurnos(prevTurnos => prevTurnos.map(turno => 
+        turno.id === id ? { ...turno, estado: nuevoEstado } : turno
+      ));
+      setMessage({ text: 'Estado del turno actualizado.', type: 'success' });
+
+    } catch (error: any) {
+      setMessage({ text: error.message, type: 'error' });
+    }
+  };
+  
+  // --- RENDERIZADO DEL COMPONENTE ---
 
   return (
     <div className={styles.appointmentManagementContainer}>
       <h1 className={styles.title}>Gestión de Turnos</h1>
 
-      {message && <div className={styles.message}>{message}</div>}
+      {message && <div className={`${styles.message} ${message.type === 'error' ? styles.error : styles.success}`}>{message.text}</div>}
 
       {/* Formulario para añadir nuevo turno */}
       <div className={styles.addAppointmentSection}>
         <h2 className={styles.sectionTitle}>Añadir Nuevo Turno</h2>
         <div className={styles.formGrid}>
-          <input
-            type="text"
-            name="clientName"
-            placeholder="Nombre del Cliente"
-            value={newAppointment.clientName}
-            onChange={handleNewAppointmentChange}
-            className={styles.inputField}
-            required
-          />
-          <input
-            type="email"
-            name="clientEmail"
-            placeholder="Email del Cliente (opcional)"
-            value={newAppointment.clientEmail}
-            onChange={handleNewAppointmentChange}
-            className={styles.inputField}
-          />
-          <input
-            type="tel"
-            name="clientPhone"
-            placeholder="Teléfono del Cliente (opcional)"
-            value={newAppointment.clientPhone}
-            onChange={handleNewAppointmentChange}
-            className={styles.inputField}
-          />
+          {/* El nombre del cliente se obtendría del usuario logueado (solicitanteId) */}
           <select
-            name="serviceId"
-            value={newAppointment.serviceId}
-            onChange={handleNewAppointmentChange}
+            name="serviciosIds"
+            value={newTurno.serviciosIds[0] || ''}
+            onChange={handleNewTurnoChange}
             className={styles.selectField}
             required
           >
             <option value="">Seleccione un Servicio</option>
-            {mockServices.map(service => (
-              <option key={service.id} value={service.id}>{service.name}</option>
+            {services.map(service => (
+              <option key={service.id} value={service.id}>{service.nombre} (${service.precio})</option>
             ))}
           </select>
           <select
-            name="professionalId"
-            value={newAppointment.professionalId}
-            onChange={handleNewAppointmentChange}
+            name="profesionalId"
+            value={newTurno.profesionalId}
+            onChange={handleNewTurnoChange}
             className={styles.selectField}
             required
           >
             <option value="">Seleccione un Profesional</option>
-            {mockProfessionals.map(professional => (
-              <option key={professional.id} value={professional.id}>{professional.name}</option>
+            {mockProfessionals.map(prof => (
+              <option key={prof.id} value={prof.id}>{prof.name}</option>
             ))}
           </select>
           <input
             type="date"
-            name="date"
-            value={newAppointment.date}
-            onChange={handleNewAppointmentChange}
+            name="fecha"
+            value={newTurno.fecha}
+            onChange={handleNewTurnoChange}
             className={styles.inputField}
             required
           />
           <input
             type="time"
-            name="time"
-            value={newAppointment.time}
-            onChange={handleNewAppointmentChange}
+            name="hora"
+            value={newTurno.hora}
+            onChange={handleNewTurnoChange}
             className={styles.inputField}
             required
           />
           <textarea
-            name="notes"
+            name="notas"
             placeholder="Notas (opcional)"
-            value={newAppointment.notes}
-            onChange={handleNewAppointmentChange}
+            value={newTurno.notes}
+            onChange={handleNewTurnoChange}
             className={styles.textareaField}
             rows={2}
           />
-          <button onClick={handleAddAppointment} className={styles.addButton}>
+          <button onClick={handleAddTurno} className={styles.addButton}>
             <FaPlus /> Añadir Turno
           </button>
         </div>
@@ -281,85 +302,25 @@ const AppointmentManagement: React.FC = () => {
       {/* Lista de turnos existentes */}
       <div className={styles.appointmentsListSection}>
         <h2 className={styles.sectionTitle}>Turnos Existentes</h2>
-        {appointments.length === 0 ? (
+        {loading ? (
+          <div className={styles.loading}>
+            <FaSpinner className={styles.spinner} /> Cargando turnos...
+          </div>
+        ) : turnos.length === 0 ? (
           <p>No hay turnos registrados.</p>
         ) : (
           <ul className={styles.appointmentList}>
-            {appointments.map(appt => (
-              <li key={appt.id} className={styles.appointmentItem}>
-                {editingAppointment && editingAppointment.id === appt.id ? (
-                  // Modo edición
+            {turnos.map(turno => (
+              <li key={turno.id} className={styles.appointmentItem}>
+                {editingTurno && editingTurno.id === turno.id ? (
+                  // MODO EDICIÓN (SOLO LOCAL)
                   <div className={styles.editForm}>
-                    <input
-                      type="text"
-                      name="clientName"
-                      value={editingAppointment.clientName}
-                      onChange={handleEditingAppointmentChange}
-                      className={styles.inputField}
-                      required
-                    />
-                    <input
-                      type="email"
-                      name="clientEmail"
-                      value={editingAppointment.clientEmail}
-                      onChange={handleEditingAppointmentChange}
-                      className={styles.inputField}
-                    />
-                    <input
-                      type="tel"
-                      name="clientPhone"
-                      value={editingAppointment.clientPhone}
-                      onChange={handleEditingAppointmentChange}
-                      className={styles.inputField}
-                    />
-                    <select
-                      name="serviceId"
-                      value={editingAppointment.serviceId}
-                      onChange={handleEditingAppointmentChange}
-                      className={styles.selectField}
-                      required
-                    >
-                      {mockServices.map(service => (
-                        <option key={service.id} value={service.id}>{service.name}</option>
-                      ))}
-                    </select>
-                    <select
-                      name="professionalId"
-                      value={editingAppointment.professionalId}
-                      onChange={handleEditingAppointmentChange}
-                      className={styles.selectField}
-                      required
-                    >
-                      {mockProfessionals.map(professional => (
-                        <option key={professional.id} value={professional.id}>{professional.name}</option>
-                      ))}
-                    </select>
-                    <input
-                      type="date"
-                      name="date"
-                      value={editingAppointment.date}
-                      onChange={handleEditingAppointmentChange}
-                      className={styles.inputField}
-                      required
-                    />
-                    <input
-                      type="time"
-                      name="time"
-                      value={editingAppointment.time}
-                      onChange={handleEditingAppointmentChange}
-                      className={styles.inputField}
-                      required
-                    />
-                    <textarea
-                      name="notes"
-                      value={editingAppointment.notes || ''}
-                      onChange={handleEditingAppointmentChange}
-                      className={styles.textareaField}
-                      rows={2}
-                    />
-                    <div className={styles.editActions}>
+                    {/* Campos de edición. Recuerda que no se guardan en el servidor */}
+                    <input type="text" value={`${turno.solicitante.nombre} ${turno.solicitante.apellido}`} readOnly className={styles.inputField} />
+                    {/* ... otros campos para editar si fuera necesario ... */}
+                     <div className={styles.editActions}>
                       <button onClick={handleSaveEdit} className={`${styles.actionButton} ${styles.saveButton}`}>
-                        <FaSave /> Guardar
+                        <FaSave /> Guardar Localmente
                       </button>
                       <button onClick={handleCancelEdit} className={`${styles.actionButton} ${styles.cancelButton}`}>
                         <FaTimes /> Cancelar
@@ -367,19 +328,33 @@ const AppointmentManagement: React.FC = () => {
                     </div>
                   </div>
                 ) : (
-                  // Modo visualización
+                  // MODO VISUALIZACIÓN
                   <div className={styles.appointmentDetails}>
-                    <p><strong>Cliente:</strong> {appt.clientName}</p>
-                    <p><strong>Servicio:</strong> {getServiceName(appt.serviceId)}</p>
-                    <p><strong>Profesional:</strong> {getProfessionalName(appt.professionalId)}</p>
-                    <p><strong>Fecha:</strong> {appt.date}</p>
-                    <p><strong>Hora:</strong> {appt.time}</p>
-                    {appt.notes && <p><strong>Notas:</strong> {appt.notes}</p>}
+                    <p><strong>Cliente:</strong> {turno.solicitante.nombre} {turno.solicitante.apellido}</p>
+                    <p><strong>Servicio:</strong> {turno.servicios.map(s => s.nombre).join(', ')}</p>
+                    <p><strong>Profesional:</strong> {turno.profesional.nombre} {turno.profesional.apellido}</p>
+                    <p><strong>Fecha:</strong> {turno.fecha}</p>
+                    <p><strong>Hora:</strong> {turno.hora}</p>
+                    {turno.notas && <p><strong>Notas:</strong> {turno.notas}</p>}
+                    
+                    <div className={styles.statusSection}>
+                      <strong>Estado: </strong>
+                      <select 
+                        value={turno.estado} 
+                        onChange={(e) => handleUpdateEstado(turno.id, e.target.value)}
+                        className={styles.statusSelect}
+                      >
+                        {ESTADOS_TURNO.map(estado => (
+                          <option key={estado} value={estado}>{estado.replace('_', ' ')}</option>
+                        ))}
+                      </select>
+                    </div>
+
                     <div className={styles.actions}>
-                      <button onClick={() => handleEditClick(appt)} className={`${styles.actionButton} ${styles.editButton}`}>
+                      <button onClick={() => handleEditClick(turno)} className={`${styles.actionButton} ${styles.editButton}`} title="Editar Localmente">
                         <FaEdit /> Editar
                       </button>
-                      <button onClick={() => handleDeleteAppointment(appt.id)} className={`${styles.actionButton} ${styles.deleteButton}`}>
+                      <button onClick={() => handleDeleteTurno(turno.id)} className={`${styles.actionButton} ${styles.deleteButton}`}>
                         <FaTrash /> Eliminar
                       </button>
                     </div>

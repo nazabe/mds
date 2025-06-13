@@ -40,7 +40,7 @@ const ProfessionalManagement: React.FC = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/listarUser`);
       if (!response.ok) {
-        throw new Error(`Error al cargar usuarios: ${response.statusText}`);
+        throw new Error(`Error al cargar usuarios`);
       }
       const apiData: ApiUser[] = await response.json();
       
@@ -189,7 +189,7 @@ const ProfessionalManagement: React.FC = () => {
         });
         
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ message: `Error al eliminar: ${response.statusText}` }));
+          const errorData = await response.json().catch(() => ({ message: `Error al eliminar` }));
           throw new Error(errorData.message);
         }
 
