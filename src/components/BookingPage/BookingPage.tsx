@@ -219,8 +219,7 @@ const BookingPage: React.FC = () => {
             <div className={styles.stepContainer}>
                 <div className={styles.stepIndicator}>
                     {showStep2 ? (<FaCheckCircle className={`${styles.stepIcon} ${styles.stepIconCompleted}`} />) : (<FaRegCircle className={styles.stepIcon} />)}
-                    <h2 className={styles.stepTitle}>Paso 1: Seleccione un Servicio</h2>
-                    {selectedServiceId !== null && (<span className={styles.selectedServiceName}>: {getSelectedServiceName(selectedServiceId)}</span>)}
+                    <h2 className={styles.stepTitle}>Paso 1: Seleccione un Servicio</h2>    
                 </div>
                 {services.length > 0 ? (
                     <div className={styles.servicesGallery}>

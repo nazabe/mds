@@ -1,40 +1,52 @@
 /* src/components/MyAppointments/MyAppointments.module.css */
+
+/* Paleta unificada (recordatorio):
+   Fondo de página: (se asume blanco o gris muy claro en el body del html)
+   Contenedor Principal: #fffafa (casi blanco) con sombra rosa
+   Secciones/Items: #ffffff (blanco puro) con borde y sombra sutil rosa
+   Texto Principal: #272727 (gris oscuro/casi negro)
+   Texto Destacado (strong): #d81b60 (rosa intenso oscuro)
+   Iconos Principales: #e91e63 (rosa intenso)
+   Bordes Suaves: #ffcdd2 (rosa pastel)
+   Fondos de mensajes/placeholders: #ffe0e6 (rosa pálido) o #fdebf2 (rosa pastel claro)
+*/
+
 .myAppointmentsContainer {
     max-width: 800px;
     margin: 40px auto;
     padding: 30px;
-    background-color: #ffffff;
+    background-color: #fffafa; /* Fondo casi blanco, más cálido */
     border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(233, 30, 99, 0.1); /* Sombra rosa sutil */
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    color: #333;
+    color: #272727; /* Color de texto principal unificado */
 }
 
 .title {
     font-size: 2.2rem;
-    color: #1a2a4d;
+    color: #272727; /* Color de título principal unificado */
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 10px; /* Reducido para acercar al subtítulo */
 }
 
 .subtitle {
     font-size: 1.2rem;
-    color: #555;
+    color: #555; /* Un gris medio para el subtítulo está bien */
     text-align: center;
     margin-bottom: 30px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #ffcdd2; /* Borde inferior rosa pastel */
     padding-bottom: 15px;
 }
 
 .noAppointmentsMessage {
     text-align: center;
     font-size: 1.1rem;
-    color: #777;
     padding: 20px;
-    background-color: #f9f9f9;
-    border: 1px dashed #ccc;
     border-radius: 8px;
     margin-top: 30px;
+    background-color: #ffe0e6; /* Fondo rosa pálido para mensajes */
+    border: 1px dashed #f48fb1; /* Borde discontinuo rosa intermedio */
+    color: #272727; /* Texto principal para buena legibilidad */
 }
 
 .appointmentsList {
@@ -44,63 +56,73 @@
 }
 
 .appointmentItem {
-    background-color: #fefefe;
-    border: 1px solid #eee;
+    background-color: #ffffff; /* Fondo blanco puro para items */
+    border: 1px solid #ffcdd2; /* Borde rosa pastel */
     border-radius: 8px;
     padding: 20px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px; /* Aumentado un poco el espacio entre items */
+    box-shadow: 0 2px 8px rgba(233, 30, 99, 0.07); /* Sombra rosa muy sutil */
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px; /* Espacio entre header y details */
 }
 
 .appointmentHeader {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #f0f0f0;
+    gap: 12px; /* Espacio entre icono y título */
     padding-bottom: 10px;
+    border-bottom: 1px solid #fdebf2; /* Borde inferior rosa pastel muy claro */
 }
 
 .itemIcon {
     font-size: 1.8rem;
-    color: #e91e63; /* Color rosa de marca */
+    color: #e91e63; /* Color rosa intenso para iconos */
+    flex-shrink: 0; /* Evita que el icono se encoja */
 }
 
 .itemTitle {
     font-size: 1.4rem;
-    color: #1a2a4d;
+    color: #272727; /* Título del item en color principal */
     margin: 0;
+    font-weight: 600; /* Un poco más de peso para el título del turno */
+}
+
+.appointmentDetails {
+    /* No necesita estilos directos aquí, se aplican a los <p> hijos */
 }
 
 .appointmentDetails p {
-    margin: 5px 0;
+    margin: 8px 0; /* Espaciado vertical entre párrafos de detalles */
     font-size: 1rem;
-    color: #555;
+    color: #272727; /* Texto principal */
+    line-height: 1.5; /* Mejor legibilidad */
+    display: flex; /* Para alinear íconos en línea con el texto */
+    align-items: center;
+    gap: 8px; /* Espacio entre el ícono en línea y el texto */
 }
 
 .appointmentDetails strong {
-    color: #1a2a4d;
-    display: inline-flex; /* Para alinear el ícono con el texto fuerte */
-    align-items: center;
-    gap: 5px;
+    color: #d81b60; /* Texto destacado (etiquetas) en rosa intenso oscuro */
+    font-weight: 600;
+    /* Remover flex aquí, ya que el <p> padre lo maneja */
 }
 
 .clientContact {
     margin-top: 15px;
-    padding-top: 10px;
-    border-top: 1px dashed #eee;
+    padding-top: 15px;
+    border-top: 1px dashed #ffcdd2; /* Borde discontinuo rosa pastel */
     font-size: 0.95rem;
-    color: #777;
+    color: #555; /* Un gris medio para información de contacto */
 }
+/* No necesitamos .inputField aquí, ya que no hay inputs en esta vista */
+
 
 /* Responsive */
 @media (max-width: 768px) {
     .myAppointmentsContainer {
-        padding: 20px;
-        margin: 20px auto;
+        padding: 20px 15px;
+        margin: 20px 10px;
     }
 
     .title {
@@ -108,23 +130,29 @@
     }
 
     .subtitle {
-        font-size: 1rem;
+        font-size: 1.1rem; /* Ligeramente más grande para móvil */
         margin-bottom: 20px;
     }
 
     .itemTitle {
-        font-size: 1.2rem;
+        font-size: 1.25rem; /* Un poco más grande para mejor lectura */
     }
 
     .itemIcon {
-        font-size: 1.5rem;
+        font-size: 1.6rem;
     }
 
     .appointmentItem {
         padding: 15px;
+        gap: 10px;
     }
 
     .appointmentDetails p {
         font-size: 0.95rem;
+        gap: 6px; /* Espacio reducido para íconos en línea en móvil */
+    }
+
+    .noAppointmentsMessage {
+        font-size: 1rem;
     }
 }
