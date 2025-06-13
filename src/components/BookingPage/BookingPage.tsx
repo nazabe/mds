@@ -1,125 +1,140 @@
 // src/components/BookingPage/BookingPage.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // useEffect añadido
 import { useNavigate } from 'react-router-dom';
 import styles from './BookingPage.module.css';
-import { FaCheckCircle, FaRegCircle, FaHeart, FaClock, FaDollarSign, FaCalendarAlt, FaUserCircle, FaShoppingCart, FaPlus, FaArrowRight } from 'react-icons/fa'; // Añadidas FaShoppingCart, FaPlus, FaArrowRight
+import { FaCheckCircle, FaRegCircle, FaHeart, FaClock, FaDollarSign, FaCalendarAlt, FaShoppingCart, FaPlus } from 'react-icons/fa';
 import 'react-datepicker/dist/react-datepicker.css';
 import DatePicker from 'react-datepicker';
+import { useCart, CartItem } from '../Cart/CartContext';
 
-// Importa el hook useCart y la interfaz CartItem
-import { useCart, CartItem } from '../Cart/CartContext'; // Asegúrate de que la ruta sea correcta
-
-// --- Interfaces y Datos de Servicios Originales ---
+// --- Interfaz para un Servicio (adaptada para la API y el Carrito) ---
 interface Service {
-  id: number;
+  id: string; // El ID de la API (convertido a string)
   name: string;
-  duration: string; // Ej: "50 minutos"
-  price: string;    // Ej: "$12.000"
-  icon?: React.ReactNode;
+  description: string; // Aunque no se muestre prominentemente, es bueno tenerlo
+  price: number; // Precio como número
+  durationMinutes: number; // Duración como número de minutos
   imageUrl?: string;
 }
 
-const servicesData: Service[] = [
-  { id: 1, name: "Masaje Anti-stress", duration: "50 minutos", price: "$12.000", icon: <FaHeart />, imageUrl: "/mds/images/services/massage-3795693_1280.jpg" },
-  { id: 2, name: "Masaje Descontracturante", duration: "60 minutos", price: "$13.000", icon: <FaHeart />, imageUrl: "/mds/images/services/massage-2768832_1280.jpg" },
-  { id: 3, name: "Masaje con Piedras Calientes", duration: "70 minutos", price: "$15.000", icon: <FaHeart />, imageUrl: "/mds/images/services/m_116_1677502402.jpg" },
-  { id: 4, name: "Masaje Circulatorio", duration: "45 minutos", price: "$11.000", icon: <FaHeart />, imageUrl: "/mds/images/services/people-3184615_1280.jpg" },
-  { id: 5, name: "Lifting de Pestaña", duration: "50 minutos", price: "$8.500", icon: <FaHeart />, imageUrl: "/mds/images/services/woman-567021_1280.jpg" },
-  { id: 6, name: "Depilación Facial", duration: "25 minutos", price: "$4.000", icon: <FaHeart />, imageUrl: "/mds/images/services/beautiful-young-woman-facial-treatment-beauty-salon-applying-cream_219728-3075.avif" },
-  { id: 7, name: "Belleza de Manos y Pies", duration: "90 minutos", price: "$10.000", icon: <FaHeart />, imageUrl: "/mds/images/services/physical-therapy-2133286_1280.jpg" },
-  { id: 8, name: "Punta de Diamante Microexfoliación", duration: "60 minutos", price: "$9.500", icon: <FaHeart />, imageUrl: "/mds/images/services/831TreatmentShoot_Derma_0204.jpg" },
-  { id: 9, name: "Limpieza Profunda + Hidratación", duration: "70 minutos", price: "$11.000", icon: <FaHeart />, imageUrl: "/mds/images/services/face-2722810_1280.jpg" },
-  { id: 10, name: "Crio Frecuencia Facial", duration: "40 minutos", price: "$9.000", icon: <FaHeart />, imageUrl: "/mds/images/services/conoce-todo-sobre-la-radio-frecuencia-facial.jpg" },
-  { id: 11, name: "VelaSlim", duration: "45 minutos", price: "$10.500", icon: <FaHeart />, imageUrl: "/mds/images/services/facial-8224799_1280.jpg" },
-  { id: 12, name: "DermoHealth", duration: "40 minutos", price: "$9.000", icon: <FaHeart />, imageUrl: "/mds/images/services/ai-generated-8270432_1280.jpg" },
-  { id: 13, name: "Criofrecuencia Corporal", duration: "XX minutos", price: "$XXXXX,XX", icon: <FaHeart />, imageUrl: "https://placehold.co/180x120/fdebf2/1a2a4d?text=Criofrecuencia+Corporal" },
-  { id: 14, name: "Ultracavitación", duration: "XX minutos", price: "$XXXXX,XX", icon: <FaHeart />, imageUrl: "https://placehold.co/180x120/fdebf2/1a2a4d?text=Ultracavitación" }
-];
+// Interfaz para el objeto que devuelve la API /listaServicio
+// (Similar a la usada en ServiceManagement)
+interface ApiService {
+  id: string | number;
+  nombre: string;
+  precio: number;
+  tiempo: number;
+  // La API no especifica 'descripcion' o 'imageUrl' en /listaServicio
+  descripcion?: string; 
+  imageUrl?: string;
+}
 
-// --- Nueva Interfaz y Datos para Profesionales (para compatibilidad con CartItem) ---
+const API_BASE_URL = 'https://web-spa-hjzu.onrender.com';
+
+// --- Datos para Profesionales (se mantienen hardcodeados por ahora) ---
 interface ProfessionalData {
-    id: string; // ID único para el profesional (string)
+    id: string;
     name: string;
-    specialty: string; // Por ejemplo, "Masajes y Faciales", "Dermatología"
-    // Puedes añadir más campos aquí como email, phone, etc.
+    specialty: string;
 }
 
 const professionalsData: ProfessionalData[] = [
     { id: 'prof-1', name: 'Dra. López', specialty: 'Masajes y Faciales' },
     { id: 'prof-2', name: 'Dr. García', specialty: 'Dermatología' },
     { id: 'prof-3', name: 'Lic. Pérez', specialty: 'Nutrición' },
-    // Añade más profesionales si los tienes
 ];
 
 
 const BookingPage: React.FC = () => {
     // ===================== Estado del Componente =====================
-    const [selectedServiceId, setSelectedServiceId] = useState<number | null>(null);
+    const [services, setServices] = useState<Service[]>([]); // Estado para servicios cargados de la API
+    const [isLoadingServices, setIsLoadingServices] = useState<boolean>(true); // Estado de carga para servicios
+    
+    const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null); // Cambiado a string
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [selectedTime, setSelectedTime] = useState<string | null>(null);
-    // REMOVIDOS: formData, isClientLoggedIn, authFormData, authMessage (Paso 3)
-    const [selectedProfessionalId, setSelectedProfessionalId] = useState<string | null>(null); // Cambiado a ID de string
-    const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error', message: string } | null>(null); // Estado para mensajes de éxito/error
+    const [selectedProfessionalId, setSelectedProfessionalId] = useState<string | null>(null);
+    const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
-    // Hooks de React Router y Cart Context
     const navigate = useNavigate();
-    const { addToCart } = useCart(); // Acceso al hook del carrito
+    const { addToCart } = useCart();
+
+    // ===================== Carga de Servicios desde la API =====================
+    useEffect(() => {
+        const fetchServicesFromApi = async () => {
+            setIsLoadingServices(true);
+            setStatusMessage(null);
+            try {
+                const response = await fetch(`${API_BASE_URL}/listaServicio`);
+                if (!response.ok) {
+                    throw new Error(`Error al cargar servicios: ${response.statusText}`);
+                }
+                const apiData: ApiService[] = await response.json();
+                
+                const loadedServices: Service[] = apiData.map(apiService => ({
+                    id: String(apiService.id),
+                    name: apiService.nombre,
+                    description: apiService.descripcion || 'Descripción no detallada.', // Valor por defecto
+                    price: apiService.precio,
+                    durationMinutes: apiService.tiempo,
+                    imageUrl: apiService.imageUrl || `https://placehold.co/180x120/fdebf2/1a2a4d?text=${encodeURIComponent(apiService.nombre)}`
+                }));
+                setServices(loadedServices);
+            } catch (error) {
+                console.error("Error fetching services for BookingPage:", error);
+                setStatusMessage({ type: 'error', message: error instanceof Error ? error.message : 'Error al cargar servicios.' });
+                setServices([]);
+            } finally {
+                setIsLoadingServices(false);
+            }
+        };
+
+        fetchServicesFromApi();
+    }, []); // El array vacío asegura que se ejecute solo al montar el componente
+
 
     // ===================== Funciones Manejadoras de Eventos =====================
-
-    const handleSelectService = (serviceId: number) => {
+    const handleSelectService = (serviceId: string) => { // Acepta string
         setSelectedServiceId(serviceId);
-        console.log("Servicio seleccionado ID:", serviceId);
-        // Reiniciar selecciones dependientes al cambiar el servicio
         setSelectedProfessionalId(null);
         setSelectedDate(null);
         setSelectedTime(null);
-        setStatusMessage(null); // Limpiar mensaje de estado al iniciar nueva selección
+        setStatusMessage(null);
     };
 
     const handleDateChange = (date: Date | null) => {
         setSelectedDate(date);
-        console.log("Fecha seleccionada:", date);
         setSelectedTime(null);
-        setStatusMessage(null); // Limpiar mensaje de estado al cambiar la fecha
+        setStatusMessage(null);
     };
 
     const handleSelectTime = (time: string) => {
         setSelectedTime(time);
-        console.log("Horario seleccionado:", time);
-        setStatusMessage(null); // Limpiar mensaje de estado al cambiar la hora
+        setStatusMessage(null);
     };
 
-    // Modificado para usar ID de profesional (string)
     const handleProfessionalChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedProfessionalId(e.target.value);
-        console.log("Profesional seleccionado ID:", e.target.value);
         setSelectedDate(null);
         setSelectedTime(null);
-        setStatusMessage(null); // Limpiar mensaje de estado al cambiar el profesional
+        setStatusMessage(null);
     };
 
-    // Modificada la función handleGoBack (ahora solo hay 2 pasos visibles)
     const handleGoBack = () => {
-        if (selectedDate !== null && selectedTime !== null) { // Si estamos en el punto de seleccionar fecha/hora
-            console.log("Volviendo al Paso 2 - deseleccionando fecha/hora");
+        if (selectedDate !== null || selectedTime !== null) {
             setSelectedDate(null);
             setSelectedTime(null);
-        } else if (selectedProfessionalId !== null) { // Si estamos en el punto de seleccionar profesional
-            console.log("Volviendo al Paso 2 - deseleccionando profesional");
+        } else if (selectedProfessionalId !== null) {
             setSelectedProfessionalId(null);
-            setSelectedDate(null); // Asegurarse
-            setSelectedTime(null); // Asegurarse
-        } else if (selectedServiceId !== null) { // Si estamos en el punto de seleccionar servicio
-            console.log("Volviendo al Paso 1 - deseleccionando servicio");
+        } else if (selectedServiceId !== null) {
             setSelectedServiceId(null);
         }
-        setStatusMessage(null); // Limpiar mensaje de estado al retroceder
+        setStatusMessage(null);
     };
 
-    // NUEVO: Función para añadir la reserva al carrito
     const handleAddBookingToCart = () => {
-        const selectedService = servicesData.find(s => s.id === selectedServiceId);
+        // Encontrar el servicio usando el ID (string) del estado 'services'
+        const selectedService = services.find(s => s.id === selectedServiceId);
         const selectedProfessional = professionalsData.find(p => p.id === selectedProfessionalId);
 
         if (!selectedService || !selectedProfessional || !selectedDate || !selectedTime) {
@@ -127,62 +142,67 @@ const BookingPage: React.FC = () => {
             return;
         }
 
-        // Convertir duration "XX minutos" a number
-        const durationMatch = selectedService.duration.match(/(\d+)\s*minutos/);
-        const durationMinutes = durationMatch ? parseInt(durationMatch[1], 10) : 0;
-
-        // Convertir price "$X.XXX" a number
-        const priceNumber = parseFloat(selectedService.price.replace(/[$.]/g, '').replace(',', '.')) || 0;
-
-
         const newCartItem: CartItem = {
-            id: `cart-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`, // ID único para el ítem del carrito
-            service: {
-                id: String(selectedService.id), // Convierte a string para el carrito
+            id: `cart-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+            service: { // Los datos del servicio ya están en el formato correcto
+                id: selectedService.id,
                 name: selectedService.name,
-                price: priceNumber, // Ya es number
-                durationMinutes: durationMinutes, // Ya es number
+                price: selectedService.price,
+                durationMinutes: selectedService.durationMinutes,
             },
             professional: {
-                id: selectedProfessional.id, // ID de string
+                id: selectedProfessional.id,
                 name: selectedProfessional.name,
                 specialty: selectedProfessional.specialty,
             },
-            date: selectedDate.toISOString().split('T')[0], // Formatear Date a 'YYYY-MM-DD'
+            date: selectedDate.toISOString().split('T')[0],
             time: selectedTime,
-            quantity: 1, // Siempre 1 para una reserva individual
-            notes: '', // No hay notas en este formulario, se puede añadir un campo si es necesario
+            quantity: 1,
+            notes: '', 
         };
 
         addToCart(newCartItem);
         setStatusMessage({ type: 'success', message: "¡Reserva añadida al carrito exitosamente! Puede hacer otra reserva." });
 
-
-        // Reiniciar el formulario para que el cliente pueda hacer otra reserva
         setSelectedServiceId(null);
         setSelectedProfessionalId(null);
         setSelectedDate(null);
         setSelectedTime(null);
     };
 
-    // NUEVO: Función para ir a la página del carrito
     const handleGoToCart = () => {
-        navigate('/cart'); // Navega a la ruta del carrito
+        navigate('/cart');
     };
 
     // ===================== Renderizado del Componente BookingPage =====================
     const availableTimes = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00"];
 
-    const getSelectedServiceName = (id: number | null) => {
+    const getSelectedServiceName = (id: string | null) => { // Acepta string
         if (id === null) return "Servicio no seleccionado";
-        const service = servicesData.find(s => s.id === id);
+        const service = services.find(s => s.id === id); // Busca en el estado 'services'
         return service ? service.name : "Servicio desconocido";
     };
 
-    // Show step 2 if a service is selected
     const showStep2 = selectedServiceId !== null;
-    // showCartButtons significa que la reserva está lista para añadir al carrito
     const showCartButtons = selectedServiceId !== null && selectedProfessionalId !== null && selectedDate !== null && selectedTime !== null;
+
+    if (isLoadingServices) {
+        return (
+            <div className={styles.bookingPageContainer}>
+                <h1 className={styles.pageTitle}>Reservar Turno</h1>
+                <div className={styles.loadingMessage}>Cargando servicios...</div>
+            </div>
+        );
+    }
+    
+    if (!isLoadingServices && services.length === 0 && !statusMessage?.message.includes("Error")) {
+        return (
+            <div className={styles.bookingPageContainer}>
+                <h1 className={styles.pageTitle}>Reservar Turno</h1>
+                <div className={styles.infoMessage}>No hay servicios disponibles en este momento. Por favor, intente más tarde.</div>
+            </div>
+        );
+    }
 
 
     return (
@@ -202,20 +222,36 @@ const BookingPage: React.FC = () => {
                     <h2 className={styles.stepTitle}>Paso 1: Seleccione un Servicio</h2>
                     {selectedServiceId !== null && (<span className={styles.selectedServiceName}>: {getSelectedServiceName(selectedServiceId)}</span>)}
                 </div>
-                <div className={styles.servicesGallery}>
-                    {servicesData.map(service => (
-                        <div key={service.id} className={`${styles.serviceCard} ${selectedServiceId === service.id ? styles.selected : ''}`} onClick={() => handleSelectService(service.id)}>
-                            {service.imageUrl && (<img src={service.imageUrl} alt={service.name} className={styles.serviceImage} onError={(e) => { const target = e.target as HTMLImageElement; target.onerror = null; target.src = '/mds/images/services/placeholder.jpg'; }} />)}
-                            {!service.imageUrl && service.icon && (<div className={styles.serviceIcon}>{service.icon}</div>)}
-                            <h3 className={styles.serviceName}>{service.name}</h3>
-                            <div className={styles.serviceInfo}>
-                                <p className={styles.serviceDetail}><FaClock className={styles.infoIcon} />{service.duration}</p>
-                                <p className={styles.serviceDetail}><FaDollarSign className={styles.infoIcon} />{service.price}</p>
+                {services.length > 0 ? (
+                    <div className={styles.servicesGallery}>
+                        {services.map(service => ( // Iterar sobre el estado 'services'
+                            <div key={service.id} className={`${styles.serviceCard} ${selectedServiceId === service.id ? styles.selected : ''}`} onClick={() => handleSelectService(service.id)}>
+                                {service.imageUrl && (
+                                    <img 
+                                        src={service.imageUrl} 
+                                        alt={service.name} 
+                                        className={styles.serviceImage} 
+                                        onError={(e) => { 
+                                            const target = e.target as HTMLImageElement; 
+                                            target.onerror = null; 
+                                            target.src = `https://placehold.co/180x120/cccccc/333333?text=Imagen+no+disponible`; // Placeholder mejorado
+                                        }} 
+                                    />
+                                )}
+                                {/* El ícono genérico <FaHeart /> se puede añadir aquí si se desea para todos */}
+                                {/* {!service.imageUrl && (<div className={styles.serviceIcon}><FaHeart /></div>)} */}
+                                <h3 className={styles.serviceName}>{service.name}</h3>
+                                <div className={styles.serviceInfo}>
+                                    <p className={styles.serviceDetail}><FaClock className={styles.infoIcon} />{service.durationMinutes} minutos</p>
+                                    <p className={styles.serviceDetail}><FaDollarSign className={styles.infoIcon} />${service.price.toLocaleString('es-AR')}</p> {/* Formatear precio */}
+                                </div>
+                                {selectedServiceId === service.id && (<div className={styles.selectedIndicator}><FaCheckCircle className={styles.checkIcon} /></div>)}
                             </div>
-                            {selectedServiceId === service.id && (<div className={styles.selectedIndicator}><FaCheckCircle className={styles.checkIcon} /></div>)}
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                ) : (
+                    !isLoadingServices && <p>No hay servicios disponibles para mostrar.</p>
+                )}
             </div>
 
             {/* ===================== Bloque del Paso 2: Selección de Profesional, Fecha y Hora ===================== */}
@@ -231,11 +267,10 @@ const BookingPage: React.FC = () => {
                         <select
                             id="professionalSelect"
                             className={styles.dateInput}
-                            value={selectedProfessionalId || ''} // Usar ID aquí
+                            value={selectedProfessionalId || ''}
                             onChange={handleProfessionalChange}
                         >
                             <option value="">-- Seleccione un profesional --</option>
-                            {/* Mapear los profesionales con sus IDs */}
                             {professionalsData.map(prof => (
                                 <option key={prof.id} value={prof.id}>{prof.name} - {prof.specialty}</option>
                             ))}
@@ -276,20 +311,19 @@ const BookingPage: React.FC = () => {
                     </div>
 
                     <div className={styles.bookingActions}>
-                        {/* Botones de acción del carrito */}
                         <button
                             onClick={handleAddBookingToCart}
                             className={styles.addToCartButton}
-                            disabled={!showCartButtons} // Habilitar solo si todo está seleccionado
+                            disabled={!showCartButtons}
                         >
                             <FaPlus className={styles.buttonIcon} /> Añadir al Carrito y Hacer Otra Reserva
                         </button>
                         <button
-                            onClick={() => { handleAddBookingToCart(); handleGoToCart(); }}
+                            onClick={() => { if(showCartButtons) { handleAddBookingToCart(); handleGoToCart(); } }} // Prevenir error si se hace clic antes
                             className={styles.goToCartButton}
-                            disabled={!showCartButtons} // Habilitar solo si todo está seleccionado
+                            disabled={!showCartButtons}
                         >
-                            <FaShoppingCart className={styles.buttonIcon} /> Finalzar Reserva y Pagar
+                            <FaShoppingCart className={styles.buttonIcon} /> Finalizar Reserva y Pagar
                         </button>
                         <button className={styles.backButton} onClick={handleGoBack}>Volver</button>
                     </div>
