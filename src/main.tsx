@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css'; // Estilos globales
 
 // Importa tus componentes de página específicos
-import App from './App.tsx';
+import App from './App.tsx'; // Tu componente principal de la página de inicio
 import BookingPage from './components/BookingPage/BookingPage.tsx';
 import LoginPage from './components/LoginPage/LoginPage.tsx';
 import AdminDashboard from './components/AdminDashboard/AdminDashboard.tsx';
@@ -14,10 +14,9 @@ import AppointmentManagement from './components/AppointmentManagement/Appointmen
 import ProfessionalDashboard from './components/ProfessionalDashboard/ProfessionalDashboard.tsx';
 import MyAppointments from './components/MyAppointments/MyAppointments.tsx';
 
-// --- PASO CLAVE 1: Importa el CartProvider y CartPage ---
+// Importa el CartProvider y CartPage
 import { CartProvider } from './components/Cart/CartContext.tsx';
 import CartPage from './components/Cart/CartPage.tsx'; // Importa la página del carrito
-
 
 // Importa los componentes de Layout y ProtectedRoute
 import Layout from './components/Layout/Layout.tsx';
@@ -37,7 +36,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <App />,
+        element: <App />, // App.tsx es tu página de inicio principal
       },
       {
         path: "reservar",
@@ -47,18 +46,32 @@ const router = createBrowserRouter([
         path: "login",
         element: <LoginPage />,
       },
-      // --- PASO CLVE 2: Añade la ruta para la página del carrito ---
       {
         path: "cart",
         element: <CartPage />,
+      },
+      // Rutas para Mercado Pago (success, pending, failure)
+      // No necesitan ser protegidas por rol, ya que MP redirige al usuario final
+      {
+        path: "pago-exitoso", // Coincide con mercadopago.success.url en backend (sin el /mds/)
+        element: <div>¡Pago Exitoso! Gracias por tu compra.</div>, // Componente real para mostrar mensaje de éxito
+      },
+      {
+        path: "pago-pendiente", // Coincide con mercadopago.pending.url en backend
+        element: <div>Tu pago está pendiente. Te notificaremos cuando se confirme.</div>, // Componente para pago pendiente
+      },
+      {
+        path: "pago-fallido", // Coincide con mercadopago.failure.url en backend
+        element: <div>¡El pago ha fallado! Por favor, intenta de nuevo.</div>, // Componente para pago fallido
       },
     ],
   },
   
   {
-    // Ruta para el dashboard de ADMINISTRADOR y sus sub-rutas, PROTEGIDA con rol 'admin'
+    // Ruta para el dashboard de ADMINISTRADOR y sus sub-rutas, PROTEGIDA con rol 'ADMIN'
     path: "/admin",
-    element: <ProtectedRoute requiredRole="admin" />, // Requiere rol 'admin'
+    // ¡IMPORTANTE: requiredRole debe ser "ADMIN" en MAYÚSCULAS!
+    element: <ProtectedRoute requiredRole="ADMIN" />, 
     children: [
       {
         path: "dashboard",
@@ -73,15 +86,16 @@ const router = createBrowserRouter([
         element: <ServiceManagement />,
       },
       {
-        path: "dashboard/appointments", // Ruta para la gestión de turnos
-        element: <AppointmentManagement />, // Asocia el componente AppointmentManagement
+        path: "dashboard/appointments",
+        element: <AppointmentManagement />,
       },
     ],
   },
   {
-    // Ruta para el dashboard de PROFESIONAL y sus sub-rutas, PROTEGIDA con rol 'professional'
+    // Ruta para el dashboard de PROFESIONAL y sus sub-rutas, PROTEGIDA con rol 'PROFESSIONAL'
     path: "/professional",
-    element: <ProtectedRoute requiredRole="professional" />, // Requiere rol 'professional'
+    // ¡IMPORTANTE: requiredRole debe ser "PROFESSIONAL" en MAYÚSCULAS!
+    element: <ProtectedRoute requiredRole="PROFESSIONAL" />, 
     children: [
       {
         path: "dashboard",
@@ -94,16 +108,19 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: "*",
+    path: "*", // Catch-all para rutas no definidas
     element: <div>404 - Página no encontrada</div>,
   },
 ], {
-  basename: "/mds/",
+  // Asegúrate de que el basename sea consistente con cómo despliegas tu frontend
+  // Si tu app React se sirve desde http://localhost:5173/mds/, esto es correcto.
+  // Si se sirve desde http://localhost:5173/, quítalo o déjalo vacío: basename: "/",
+  basename: "/mds/", 
 });
 // --- Fin Configuración del Router ---
 
 
-// --- PASO CLAVE 3: Renderizado de la Aplicación envolviendo RouterProvider con CartProvider ---
+// --- Renderizado de la Aplicación envolviendo RouterProvider con CartProvider ---
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     {/* Envuelve RouterProvider con CartProvider para que el contexto esté disponible globalmente */}

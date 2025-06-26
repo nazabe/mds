@@ -4,13 +4,14 @@ import { Navigate, Outlet } from 'react-router-dom';
 
 // Define las props que este componente puede recibir
 interface ProtectedRouteProps {
-  requiredRole?: 'admin' | 'professional'; // Rol requerido para acceder a esta ruta
+  // Los roles requeridos DEBEN ser en MAYÚSCULAS para coincidir con el backend y localStorage
+  requiredRole?: 'ADMIN' | 'PROFESSIONAL' | 'USER'; 
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) => {
   // Obtiene el token de autenticación y el rol del usuario desde localStorage
   const authToken = localStorage.getItem('authToken');
-  const userRole = localStorage.getItem('userRole'); // 'admin' o 'professional'
+  const userRole = localStorage.getItem('userRole'); // Ej: "ADMIN"
 
   // Si no hay token, el usuario no está autenticado, redirige al login
   if (!authToken) {
@@ -18,19 +19,27 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) => {
     return <Navigate to="/login" replace />;
   }
 
-  // Si se especifica un rol requerido y el rol del usuario no coincide, redirige
+  // Si se especifica un rol requerido y el rol del usuario NO coincide
+  // userRole (ej. "ADMIN") vs requiredRole (ej. "ADMIN")
   if (requiredRole && userRole !== requiredRole) {
     console.warn(`Acceso denegado: Rol '${userRole}' no autorizado para la ruta. Rol requerido: '${requiredRole}'.`);
-    // Puedes redirigir a una página de "Acceso Denegado" o a un dashboard por defecto
-    // Por ahora, si no es admin y trata de acceder a /admin, lo enviamos al login.
-    // Si es un profesional intentando acceder a una ruta de admin, lo redirigimos a su propio dashboard.
-    if (userRole === 'professional') {
-        return <Navigate to="/professional/dashboard" replace />;
+    
+    // Redireccionamiento basado en el rol REAL del usuario
+    // Si el usuario es un PROFESIONAL e intenta acceder a una ruta de ADMIN, lo enviamos a su dashboard.
+    if (userRole === 'PROFESSIONAL') {
+      return <Navigate to="/professional/dashboard" replace />;
+    } 
+    // Si el usuario es ADMIN e intenta acceder a una ruta que no le corresponde (o si el rol requerido
+    // es otro y no coincide), lo enviamos a su dashboard de admin para evitar el bucle.
+    else if (userRole === 'ADMIN') {
+        return <Navigate to="/admin/dashboard" replace />;
     }
-    return <Navigate to="/login" replace />; // O a una página de error/acceso denegado
+    // Para cualquier otro rol no autorizado o caso por defecto, redirigir al login
+    return <Navigate to="/login" replace />;
   }
 
-  // Si el token existe y el rol es válido (o no se requiere un rol específico), permite el acceso
+  // Si no hay rol requerido, o si el userRole COINCIDE con el requiredRole,
+  // entonces permite el acceso a la ruta.
   return <Outlet />;
 };
 

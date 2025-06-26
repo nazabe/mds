@@ -57,9 +57,9 @@ const LoginPage: React.FC = () => {
 
       const { token, role, email } = data;
 
-      //localStorage.setItem("authToken", token);
-      //localStorage.setItem("userRole", role);
-      //localStorage.setItem("userEmailForProfessional", email);
+      localStorage.setItem("authToken", token);
+      localStorage.setItem("userRole", role);
+      localStorage.setItem("userEmailForProfessional", email);
 
       console.log(`Inicio de sesión exitoso como ${role}. Redirigiendo...`);
 
