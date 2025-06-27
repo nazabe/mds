@@ -1,20 +1,39 @@
 // src/components/Cart/CartPage.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaShoppingCart, FaTrash, FaPlusCircle, FaMinusCircle, FaArrowLeft, FaMoneyBillWave, FaTimes, FaUserCircle, FaEnvelope, FaLock, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
+import { FaShoppingCart, FaTrash, FaPlusCircle, FaMinusCircle, FaArrowLeft, FaMoneyBillWave, FaTimes, FaUserCircle, FaEnvelope, FaLock, FaCheckCircle, FaExclamationCircle, FaDownload } from 'react-icons/fa';
 import { useCart, CartItem } from './CartContext';
 import styles from './CartPage.module.css'; // Importa el módulo CSS
 
-// Declara el objeto 'MercadoPago' globalmente para TypeScript
-declare global {
-  interface Window {
-    MercadoPago: any; // O un tipo más específico si tienes las definiciones de @types/mercadopago
-  }
+// Importa las librerías para generar PDF en el frontend
+import html2canvas from 'html2canvas'; 
+import { jsPDF } from 'jspdf'; 
+
+// Interfaz para los datos que se mostrarán en el PDF
+interface ReservationDetailsForPdf {
+  id: string;
+  client: {
+    name: string;
+    email: string;
+  };
+  appointments: Array<{
+    serviceName: string;
+    professionalName: string;
+    date: string;
+    time: string;
+    price: number;
+    quantity: number;
+  }>;
+  totalCost: number;
+  status: string;
 }
 
 const CartPage: React.FC = () => {
   const { cartItems, removeFromCart, increaseQuantity, decreaseQuantity, clearCart, getCartTotal } = useCart();
   const navigate = useNavigate();
+
+  // Ref para el elemento HTML que queremos convertir a PDF
+  const reservationPdfRef = useRef<HTMLDivElement>(null);
 
   // --- Estados para el Modal de Checkout ---
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
@@ -23,126 +42,9 @@ const CartPage: React.FC = () => {
   const [isLoadingCheckout, setIsLoadingCheckout] = useState(false);
   const [isLoggedInForCheckout, setIsLoggedInForCheckout] = useState(false); // Estado para controlar si el usuario está logeado para el checkout
   const [showRegisterForm, setShowRegisterForm] = useState(false); // Para alternar entre login y registro
-  const [preferenceId, setPreferenceId] = useState<string | null>(null); // Para almacenar el ID de preferencia de Mercado Pago
 
-  const paymentBrickContainerRef = useRef<HTMLDivElement>(null); // Referencia al div donde se montará el Brick
-
-  // --- CONFIGURACIÓN DE MERCADO PAGO ---
-  // ¡TU PUBLIC_KEY DE MERCADO PAGO!
-  const MERCADOPAGO_PUBLIC_KEY = 'TEST-7c51159f-d2dd-4e36-a58d-a747a6ae5199';
-  // URL de TU BACKEND que creará la preferencia de pago.
-  // Debe ser https://web-spa-hjzu.onrender.com/create_preference
-  const BACKEND_CREATE_PREFERENCE_URL = 'https://web-spa-hjzu.onrender.com/create_preference';
   const BACKEND_LOGIN_URL = 'https://web-spa-hjzu.onrender.com/login';
   const BACKEND_REGISTER_URL = 'https://web-spa-hjzu.onrender.com/register';
-
-
-  // Cargar el script de Mercado Pago SDK dinámicamente
-  useEffect(() => {
-    const loadMercadoPagoSdk = () => {
-      if (document.getElementById('mercadopago-sdk')) {
-        return; // Ya cargado
-      }
-      const script = document.createElement('script');
-      script.id = 'mercadopago-sdk';
-      script.src = 'https://sdk.mercadopago.com/js/v2';
-      script.onload = () => {
-        // Inicializar SDK cuando esté cargado
-        if (window.MercadoPago && MERCADOPAGO_PUBLIC_KEY) { // Check for PUBLIC_KEY existence
-          try {
-            window.MercadoPago.setPublicKey(MERCADOPAGO_PUBLIC_KEY);
-          } catch (e) {
-            console.error("Error al establecer la clave pública de Mercado Pago:", e);
-          }
-        } else {
-          console.warn("MercadoPago SDK no está listo o PUBLIC_KEY no configurada.");
-        }
-      };
-      script.onerror = () => {
-        setCheckoutMessage({ type: 'error', message: "Error al cargar el SDK de Mercado Pago. Intenta refrescar la página." });
-      };
-      document.body.appendChild(script);
-    };
-
-    loadMercadoPagoSdk();
-  }, []);
-
-  // Efecto para renderizar el Payment Brick cuando preferenceId esté disponible
-  useEffect(() => {
-    if (preferenceId && window.MercadoPago && paymentBrickContainerRef.current) {
-      try {
-        // Asegurarse de que el contenedor esté vacío antes de montar el nuevo Brick
-        paymentBrickContainerRef.current.innerHTML = '';
-
-        const mp = new window.MercadoPago(MERCADOPAGO_PUBLIC_KEY, {
-          locale: 'es-AR', // O el locale deseado
-        });
-
-        const bricksBuilder = mp.bricks();
-
-        // Crear el Payment Brick
-        bricksBuilder.create("payment", "paymentBrick_container", {
-          initialization: {
-            preferenceId: preferenceId,
-          },
-          callbacks: {
-            onReady: () => {
-              setCheckoutMessage({ type: 'info', message: "El formulario de pago está listo." });
-              setIsLoadingCheckout(false); // Quitar loading una vez que el brick está listo
-            },
-            onAction: (action: any) => {
-              console.log("Acción del Brick:", action);
-              // Puedes manejar acciones específicas aquí si es necesario
-            },
-            onError: (error: any) => {
-              console.error("Error en el Payment Brick:", error);
-              setCheckoutMessage({ type: 'error', message: "Hubo un error en el proceso de pago. Por favor, intenta de nuevo." });
-              setIsLoadingCheckout(false);
-            },
-            onReadyPayment: (paymentData: any) => {
-                // ESTE CALLBACK SE EJECUTA CUANDO EL USUARIO HA COMPLETADO LOS DATOS DE PAGO EN EL BRICK.
-                // AQUÍ DEBERÍAS ENVIAR 'paymentData' A TU BACKEND PARA FINALIZAR LA TRANSACCIÓN REAL.
-                // TU BACKEND ES EL QUE LUEGO DEBE CONFIRMAR EL PAGO CON MP Y ACTUALIZAR TU BD.
-
-                setCheckoutMessage({ type: 'info', message: "Enviando datos de pago al servidor..." });
-                setIsLoadingCheckout(true);
-
-                // --- LÓGICA DE PROCESAMIENTO FINAL EN BACKEND ---
-                // Aquí deberías realizar un fetch POST a un endpoint en tu backend
-                // que procesaría este paymentData con la API de Mercado Pago y confirmaría la orden.
-                console.log("Datos de pago listos para enviar al backend:", paymentData);
-                
-                // Ejemplo de lo que tu backend DEBERÍA hacer:
-                // const response = await fetch('https://web-spa-hjzu.onrender.com/process_payment', { // <--- Endpoint para procesar el pago final
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //         'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                //     },
-                //     body: JSON.stringify({ paymentData, cartItems: cartItems }), // Envía los datos del carrito también
-                // });
-                // if (!response.ok) { /* handle error */ }
-                // const result = await response.json(); /* handle success */
-
-                // SIMULACIÓN: Tras un procesamiento exitoso en tu backend
-                setTimeout(() => {
-                    setCheckoutMessage({ type: 'success', message: "¡Pago procesado y confirmado! Tus reservas han sido creadas." });
-                    clearCart(); // Limpiar carrito solo después de la confirmación exitosa del backend
-                    setTimeout(() => {
-                        closeCheckoutModal();
-                        navigate('/'); // Redirige al inicio o a una página de confirmación/historial de reservas
-                    }, 2000);
-                }, 2000); // Simula 2 segundos de procesamiento
-            }
-          },
-        });
-      } catch (e) {
-        console.error("Error al crear el Payment Brick de Mercado Pago:", e);
-        setCheckoutMessage({ type: 'error', message: "No se pudo cargar el formulario de pago. Asegúrate de que tu PUBLIC_KEY es correcta." });
-        setIsLoadingCheckout(false);
-      }
-    }
-  }, [preferenceId, MERCADOPAGO_PUBLIC_KEY, clearCart, navigate]); // Dependencias del useEffect
 
   // Verificar estado de login al montar o al abrir el modal
   useEffect(() => {
@@ -156,12 +58,11 @@ const CartPage: React.FC = () => {
 
   const openCheckoutModal = () => {
     if (cartItems.length === 0) {
-      setCheckoutMessage({ type: 'error', message: 'Tu carrito está vacío. Añade servicios antes de proceder al pago.' });
+      setCheckoutMessage({ type: 'error', message: 'Tu carrito está vacío. Añade servicios antes de proceder.' });
       return;
     }
     setShowCheckoutModal(true);
     setCheckoutMessage(null); // Limpiar mensajes anteriores
-    setPreferenceId(null); // Resetear preferenceId para forzar la recreación del Brick si se abre de nuevo
     // Re-chequear el login por si cambió fuera del modal
     const token = localStorage.getItem('authToken');
     if (token) {
@@ -176,7 +77,6 @@ const CartPage: React.FC = () => {
     setCheckoutMessage(null); // Limpiar mensajes al cerrar
     setAuthFormData({ email: '', password: '' }); // Limpiar formulario de auth
     setShowRegisterForm(false); // Resetear a login
-    setPreferenceId(null); // Limpiar preferenceId al cerrar el modal
   };
 
   const handleAuthInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -194,7 +94,6 @@ const CartPage: React.FC = () => {
     setCheckoutMessage({ type: 'info', message: 'Iniciando sesión...' });
 
     try {
-      // Endpoint de login de tu backend
       const response = await fetch(BACKEND_LOGIN_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -208,13 +107,12 @@ const CartPage: React.FC = () => {
 
       const data = await response.json();
       localStorage.setItem('authToken', data.token);
-      localStorage.setItem('userRole', data.role); // 'ADMIN' o 'USER'
-      localStorage.setItem('userEmailForProfessional', data.email); // Puede ser útil para rellenar datos
+      localStorage.setItem('userRole', data.role); 
+      localStorage.setItem('userEmailForProfessional', data.email); 
+      localStorage.setItem('userName', data.nombre + ' ' + data.apellido); // Guarda el nombre del usuario para el PDF
 
       setIsLoggedInForCheckout(true);
-      setCheckoutMessage({ type: 'success', message: '¡Inicio de sesión exitoso! Ahora puedes proceder con el pago.' });
-      // Después de logearse, si ya estamos en el flujo de pago, podemos intentar crear la preferencia
-      // createMercadoPagoPreference(); // Podríamos llamar a esto directamente o esperar al click en el botón de pago
+      setCheckoutMessage({ type: 'success', message: '¡Inicio de sesión exitoso! Ahora puedes confirmar tu reserva.' });
     } catch (error: any) {
       setCheckoutMessage({ type: 'error', message: error.message || 'Error al iniciar sesión.' });
       console.error("Login error:", error);
@@ -232,11 +130,10 @@ const CartPage: React.FC = () => {
     setCheckoutMessage({ type: 'info', message: 'Registrando usuario...' });
 
     try {
-      // Endpoint de registro de tu backend
       const response = await fetch(BACKEND_REGISTER_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: authFormData.email, password: authFormData.password, role: 'USER' }), // Asigna rol USER por defecto
+        body: JSON.stringify({ email: authFormData.email, password: authFormData.password, role: 'USER' }), 
       });
 
       if (!response.ok) {
@@ -244,7 +141,6 @@ const CartPage: React.FC = () => {
         throw new Error(errorData.message || 'Error al registrarse. El email podría ya estar en uso.');
       }
 
-      // Si el registro es exitoso, intenta iniciar sesión automáticamente
       const loginResponse = await fetch(BACKEND_LOGIN_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -252,16 +148,17 @@ const CartPage: React.FC = () => {
       });
 
       if (!loginResponse.ok) {
-         throw new Error('Registro exitoso, pero no se pudo iniciar sesión automáticamente.');
+          throw new Error('Registro exitoso, pero no se pudo iniciar sesión automáticamente.');
       }
 
       const loginData = await loginResponse.json();
       localStorage.setItem('authToken', loginData.token);
       localStorage.setItem('userRole', loginData.role);
       localStorage.setItem('userEmailForProfessional', loginData.email);
+      localStorage.setItem('userName', loginData.nombre + ' ' + loginData.apellido); // Guarda el nombre del usuario para el PDF
 
       setIsLoggedInForCheckout(true);
-      setCheckoutMessage({ type: 'success', message: '¡Registro e inicio de sesión exitosos! Procediendo al pago.' });
+      setCheckoutMessage({ type: 'success', message: '¡Registro e inicio de sesión exitosos! Procediendo a la confirmación.' });
     } catch (error: any) {
       setCheckoutMessage({ type: 'error', message: error.message || 'Error al registrarse.' });
       console.error("Signup error:", error);
@@ -270,68 +167,166 @@ const CartPage: React.FC = () => {
     }
   };
 
-  // Función para solicitar la creación de la preferencia de MP a tu backend
-  const createMercadoPagoPreference = async () => {
+  /**
+   * Genera el PDF del comprobante de reserva con los items del carrito.
+   */
+  const handleConfirmReservationAndPdf = async () => {
     if (cartItems.length === 0) {
       setCheckoutMessage({ type: 'error', message: "El carrito está vacío." });
       return;
     }
     if (!isLoggedInForCheckout) {
-        setCheckoutMessage({ type: 'error', message: "Debes iniciar sesión para generar el pago." });
-        return;
+      setCheckoutMessage({ type: 'error', message: "Debes iniciar sesión para confirmar y descargar la reserva." });
+      return;
     }
 
     setIsLoadingCheckout(true);
-    setCheckoutMessage({ type: 'info', message: 'Creando preferencia de pago...' });
-    setPreferenceId(null); // Limpiar cualquier preferenceId anterior para forzar que se genere uno nuevo
+    setCheckoutMessage({ type: 'info', message: 'Confirmando reserva y generando comprobante...' });
 
     try {
-      const authToken = localStorage.getItem('authToken');
-      if (!authToken) {
-        throw new Error("No hay token de autenticación. Inicie sesión nuevamente.");
+      // 1. Obtener datos del cliente logeado
+      const clientEmail = localStorage.getItem('userEmailForProfessional') || 'N/A';
+      const clientName = localStorage.getItem('userName') || 'Cliente Desconocido';
+
+      // 2. Preparar los datos para el PDF a partir de cartItems
+      const reservationDetails: ReservationDetailsForPdf = {
+        id: `RES-${Date.now()}`, // ID de reserva generado
+        client: { name: clientName, email: clientEmail },
+        appointments: cartItems.map(item => ({
+          serviceName: item.service.name,
+          professionalName: item.professional.name,
+          date: item.date,
+          time: item.time,
+          price: item.service.price,
+          quantity: item.quantity,
+        })),
+        totalCost: getCartTotal(),
+        status: 'Confirmada',
+      };
+
+      // Capturar el HTML y generar el PDF
+      const input = reservationPdfRef.current;
+      if (!input) {
+        throw new Error("No se encontró el contenido de la reserva para generar el PDF.");
       }
 
-      // Mapear cartItems al formato de "items" que Mercado Pago espera
-      const mpItems = cartItems.map(item => ({
-        id: item.service.id, // ID del servicio
-        title: `${item.service.name} (${item.professional.name} - ${item.date} ${item.time})`, // Título descriptivo
-        unit_price: item.service.price,
-        quantity: item.quantity,
-        currency_id: 'ARS', // Moneda (Argentina)
-      }));
+      // Ocultar el botón de descarga del PDF (dentro del contenido PDF) si existe
+      const downloadButtonInsidePdf = input.querySelector('#pdf-download-button-inside') as HTMLElement;
+      if (downloadButtonInsidePdf) {
+        downloadButtonInsidePdf.classList.add('hidden');
+      }
 
-      // LLAMADA A TU BACKEND para crear la preferencia de MP
-      const response = await fetch(BACKEND_CREATE_PREFERENCE_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}` // Envía el token de autenticación
-        },
-        body: JSON.stringify({ items: mpItems, total: getCartTotal() }), // Envía los ítems y el total
+      const canvas = await html2canvas(input, {
+        scale: 2, 
+        useCORS: true,
+        windowWidth: input.scrollWidth,
+        windowHeight: input.scrollHeight,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al crear la preferencia de pago en el backend.');
+      // Restaurar visibilidad del botón
+      if (downloadButtonInsidePdf) {
+        downloadButtonInsidePdf.classList.remove('hidden');
       }
 
-      const data = await response.json();
-      // Asume que tu backend devuelve { preferenceId: '...' }
-      setPreferenceId(data.preferenceId);
-      setCheckoutMessage({ type: 'info', message: "Formulario de pago de Mercado Pago cargando..." });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+
+      const imgWidth = 210; 
+      const pageHeight = 297; 
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      let position = 0;
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= -10) { // Margen para asegurar captura completa
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`comprobante_reserva_${reservationDetails.id}.pdf`);
+      
+      setCheckoutMessage({ type: 'success', message: "¡Reserva confirmada y comprobante descargado!" });
+      clearCart(); // Limpiar carrito
+      setTimeout(() => {
+        closeCheckoutModal();
+        //navigate('/mds/'); // Redirigir a la página de mis turnos
+      }, 2000);
 
     } catch (error: any) {
-      setCheckoutMessage({ type: 'error', message: error.message || 'Error al preparar el pago.' });
-      console.error("Mercado Pago preference creation error:", error);
+      setCheckoutMessage({ type: 'error', message: error.message || 'Error al generar el comprobante de reserva.' });
+      console.error("Error al generar PDF:", error);
     } finally {
-      // El loading se desactiva en el onReady del Brick o en un error del Brick
-      // setIsLoadingCheckout(false); // No desactivar aquí, el Brick controlará esto
+      setIsLoadingCheckout(false);
+    }
+  };
+
+  // Helper para formatear fechas si fuera necesario
+  const formatDate = (dateString: string): string => {
+    try {
+      const date = new Date(dateString + 'T00:00:00'); // Asegura que se parsea como fecha UTC para evitar problemas de zona horaria
+      if (isNaN(date.getTime())) {
+        throw new Error("Invalid date string");
+      }
+      return date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+    } catch (e) {
+      return dateString;
     }
   };
 
 
   return (
     <div className={styles.cartPageContainer}>
+      <script src="https://cdn.tailwindcss.com"></script>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+      <style>
+        {`
+          body { font-family: 'Inter', sans-serif; }
+          .hidden-for-pdf { display: none !important; }
+          .pdf-content-wrapper {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            color: #333;
+            font-size: 14px;
+          }
+          .pdf-header {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #4f46e5; /* Indigo */
+          }
+          .pdf-section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+          }
+          .pdf-detail-row {
+            margin-bottom: 8px;
+            line-height: 1.4;
+          }
+          .pdf-service-item {
+            margin-left: 20px;
+            margin-bottom: 5px;
+          }
+          .pdf-total-cost {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: right;
+            margin-top: 20px;
+            color: #10b981; /* Green */
+          }
+        `}
+      </style>
+
       <div className={styles.cartCard}>
         <h2 className={styles.pageTitle}>
           <FaShoppingCart className={styles.icon} /> Tu Carrito
@@ -426,7 +421,7 @@ const CartPage: React.FC = () => {
             <button className={styles.closeModalButton} onClick={closeCheckoutModal}>
               <FaTimes />
             </button>
-            <h3 className={styles.modalTitle}>Finalizar Compra</h3>
+            <h3 className={styles.modalTitle}>Confirmar Reserva</h3>
 
             {checkoutMessage && (
               <div className={`${styles.statusMessage} ${checkoutMessage.type === 'success' ? styles.successMessage : checkoutMessage.type === 'error' ? styles.errorMessage : styles.infoMessage}`}>
@@ -439,7 +434,7 @@ const CartPage: React.FC = () => {
               <div className={styles.authFormContainer}>
                 {!showRegisterForm ? (
                   <>
-                    <p className={styles.authPrompt}>Inicia sesión para continuar:</p>
+                    <p className={styles.authPrompt}>Inicia sesión para confirmar tu reserva:</p>
                     <div className={styles.formField}>
                       <label htmlFor="authEmail" className={styles.formLabel}><FaEnvelope /> Email</label>
                       <input type="email" id="authEmail" name="email" className={styles.formInput} value={authFormData.email} onChange={handleAuthInputChange} disabled={isLoadingCheckout} />
@@ -457,7 +452,7 @@ const CartPage: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <p className={styles.authPrompt}>Regístrate para continuar:</p>
+                    <p className={styles.authPrompt}>Regístrate para confirmar tu reserva:</p>
                     <div className={styles.formField}>
                       <label htmlFor="regEmail" className={styles.formLabel}><FaEnvelope /> Email</label>
                       <input type="email" id="regEmail" name="email" className={styles.formInput} value={authFormData.email} onChange={handleAuthInputChange} disabled={isLoadingCheckout} />
@@ -476,24 +471,45 @@ const CartPage: React.FC = () => {
                 )}
               </div>
             ) : (
-              // Vista de Confirmación de Pago si está logeado
+              // Vista de Confirmación de Reserva si está logeado
               <div className={styles.paymentConfirmation}>
                 <p className={styles.paymentPrompt}>Estás logeado como: <strong>{localStorage.getItem('userEmailForProfessional') || 'Usuario'}</strong></p>
-                <p className={styles.totalSummary}>Total a pagar: <strong>${getCartTotal().toFixed(2)}</strong></p>
+                <p className={styles.totalSummary}>Total de la reserva: <strong>${getCartTotal().toFixed(2)}</strong></p>
                 
-                {/* Contenedor donde Mercado Pago montará el Payment Brick */}
-                {preferenceId ? (
-                    <div id="paymentBrick_container" ref={paymentBrickContainerRef} className={styles.paymentBrickContainer}>
-                        {/* El Payment Brick de MP se renderizará aquí */}
-                        {isLoadingCheckout && ( // Mostrar un spinner si está cargando el brick
-                            <div className={styles.loadingSpinner}></div>
-                        )}
+                {/* Contenedor que se va a CAPTURAR para el PDF */}
+                <div ref={reservationPdfRef} className="pdf-content-wrapper">
+                    <h2 className="pdf-header">Comprobante de Reserva</h2>
+                    <p className="pdf-detail-row"><strong>ID de Reserva:</strong> {`RES-${Date.now()}`}</p>
+                    <p className="pdf-detail-row"><strong>Estado:</strong> Confirmada</p>
+
+                    <h3 className="pdf-section-title">Información del Cliente</h3>
+                    <p className="pdf-detail-row"><strong>Nombre:</strong> {localStorage.getItem('userName') || 'N/A'}</p>
+                    <p className="pdf-detail-row"><strong>Email:</strong> {localStorage.getItem('userEmailForProfessional') || 'N/A'}</p>
+
+                    <h3 className="pdf-section-title">Servicios Reservados</h3>
+                    <ul className="pdf-service-list">
+                        {cartItems.map((item, index) => (
+                            <li key={item.id + "-" + index} className="pdf-service-item">
+                                {item.service.name} con {item.professional.name} el {formatDate(item.date)} a las {item.time} hs. - ${item.service.price.toFixed(2)} x {item.quantity} = ${(item.service.price * item.quantity).toFixed(2)}
+                            </li>
+                        ))}
+                    </ul>
+                    <p className="pdf-total-cost">Costo Total: ${getCartTotal().toFixed(2)}</p>
+
+                    <p className="pdf-detail-row" style={{marginTop: '20px', textAlign: 'center', fontStyle: 'italic'}}>
+                        ¡Gracias por tu reserva!
+                    </p>
+                    {/* Este botón estará oculto para la captura del PDF */}
+                    <div id="pdf-download-button-inside" className="flex justify-center mt-4 hidden-for-pdf">
+                        <button className="download-button-dummy">
+                            <FaDownload /> Descargar
+                        </button>
                     </div>
-                ) : (
-                    <button onClick={createMercadoPagoPreference} className={styles.confirmPaymentButton} disabled={isLoadingCheckout || cartItems.length === 0}>
-                        {isLoadingCheckout ? 'Generando Pago...' : 'Generar Pago con Mercado Pago'}
-                    </button>
-                )}
+                </div>
+
+                <button onClick={handleConfirmReservationAndPdf} className={styles.confirmPaymentButton} disabled={isLoadingCheckout || cartItems.length === 0}>
+                  {isLoadingCheckout ? 'Confirmando...' : 'Confirmar Reserva y Descargar Comprobante'}
+                </button>
               </div>
             )}
           </div>
