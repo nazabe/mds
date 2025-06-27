@@ -34,15 +34,16 @@ const LoginPage: React.FC = () => {
     setError(null);
 
     try {
-      const response = await fetch("https://web-spa-hjzu.onrender.com/login", {
+      const response = await fetch("https://backend-ecommerce-50vz.onrender.com/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: formData.email,
+          username: formData.email, // aunque el campo sea "email", se envía como username
           password: formData.password,
         }),
+
       });
 
       if (!response.ok) {
@@ -54,25 +55,32 @@ const LoginPage: React.FC = () => {
       }
 
       const data = await response.json();
+      console.log("Respuesta del backend:", data);
 
-      const { token, role, email } = data;
+      const { token, roles, email } = data;
+
+      if (!token || roles.length === 0) {
+        throw new Error("Credenciales válidas pero sin rol asignado.");
+      }
 
       localStorage.setItem("authToken", token);
-      localStorage.setItem("userRole", role);
       localStorage.setItem("userEmailForProfessional", email);
 
-      console.log(`Inicio de sesión exitoso como ${role}. Redirigiendo...`);
+      // Asumimos que solo importa el primer rol por ahora
+      const mainRole = roles[0]; // podés hacer lógica más compleja si necesitás
 
-      // Redirecciona al dashboard correspondiente
-      if (role === "ADMIN") {
+      localStorage.setItem("userRole", mainRole.toUpperCase());
+
+      if (mainRole === "admin") {
         navigate("/admin/dashboard");
-      } else if (role === "USER") {
-        navigate("/");
-      } else if (role === "PROFESSIONAL") {
+      } else if (mainRole === "professional") {
         navigate("/professional/dashboard");
+      } else if (mainRole === "user") {
+        navigate("/");
       } else {
         throw new Error("Rol desconocido.");
       }
+
     } catch (err: unknown) {
       console.error("Error durante el login:", err);
       if (err instanceof Error) {

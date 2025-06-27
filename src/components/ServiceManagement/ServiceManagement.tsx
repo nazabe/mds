@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './ServiceManagement.module.css';
 import { FaPlus, FaEdit, FaTrash, FaSave, FaTimes } from 'react-icons/fa';
-
 // Interfaz para un Servicio
 interface Service {
   id: string;
@@ -10,62 +9,55 @@ interface Service {
   description: string;
   price: number;
   durationMinutes: number;
-  imageUrl?: string; // Opcional, si tienes imágenes para servicios
+  imageUrl?: string;
 }
 
-// Interfaz para el objeto que devuelve la API /listaServicio
-interface ApiService {
-  id: string | number; // El ID de la API podría ser número o string
-  nombre: string;
-  precio: number;
-  tiempo: number;
-  // La API no especifica 'descripcion' o 'imageUrl' en /listaServicio
-  // Si /servicio/{servicioID} los devolviera, se podrían cargar individualmente
-  // o mejor aún, modificar /listaServicio para incluirlos.
-  descripcion?: string; // Asumiendo que podría venir opcionalmente
-  imageUrl?: string;    // Asumiendo que podría venir opcionalmente
-}
-
-const API_BASE_URL = 'https://web-spa-hjzu.onrender.com';
+const API_BASE_URL = 'https://backend-ecommerce-50vz.onrender.com/api';
 
 const ServiceManagement: React.FC = () => {
   const [services, setServices] = useState<Service[]>([]);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [newService, setNewService] = useState<Omit<Service, 'id'>>({
     name: '',
-    description: '', // Se mantiene en el frontend
+    description: '',
     price: 0,
     durationMinutes: 0,
-    imageUrl: '' // Se mantiene en el frontend
+    imageUrl: ''
   });
   const [message, setMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // 🟡 Función auxiliar para convertir "01:00:00" a minutos (ej: 60)
+  const durationToMinutes = (durationStr: string): number => {
+    const [hours, minutes, seconds] = durationStr.split(':').map(Number);
+    return hours * 60 + minutes + Math.round(seconds / 60);
+  };
 
   // Cargar servicios desde la API
   const fetchServices = async () => {
     setIsLoading(true);
     setMessage(null);
     try {
-      const response = await fetch(`${API_BASE_URL}/listaServicio`);
+      const response = await fetch(`${API_BASE_URL}/services`);
       if (!response.ok) {
         throw new Error(`Error al cargar servicios: ${response.statusText}`);
       }
-      const apiData: ApiService[] = await response.json();
-      
-      // Mapear datos de la API a la interfaz Service del frontend
-      const loadedServices: Service[] = apiData.map(apiService => ({
-        id: String(apiService.id), // Aseguramos que el ID sea string
-        name: apiService.nombre,
-        description: apiService.descripcion || 'Descripción no disponible en la API.', // Valor por defecto
-        price: apiService.precio,
-        durationMinutes: apiService.tiempo,
-        imageUrl: apiService.imageUrl || `https://placehold.co/180x120/fdebf2/1a2a4d?text=${encodeURIComponent(apiService.nombre)}` // Placeholder si no viene URL
+      const apiData = await response.json();
+
+      const loadedServices: Service[] = apiData.map((item: any) => ({
+        id: String(item.serviceId),
+        name: item.name,
+        description: item.description || 'Sin descripción.',
+        price: parseFloat(item.price),
+        durationMinutes: durationToMinutes(item.duration),
+        imageUrl: item.url || `https://placehold.co/180x120/fdebf2/1a2a4d?text=${encodeURIComponent(item.name)}`
       }));
+
       setServices(loadedServices);
     } catch (error) {
       console.error("Error fetching services:", error);
       setMessage(error instanceof Error ? error.message : 'Error desconocido al cargar servicios.');
-      setServices([]); // Limpiar servicios en caso de error para no mostrar datos viejos
+      setServices([]);
     } finally {
       setIsLoading(false);
     }
@@ -74,12 +66,18 @@ const ServiceManagement: React.FC = () => {
   useEffect(() => {
     fetchServices();
   }, []);
+  // Convertir minutos a formato "HH:MM:SS"
+  const minutesToDurationString = (minutes: number): string => {
+    const hours = Math.floor(minutes / 60).toString().padStart(2, '0');
+    const mins = (minutes % 60).toString().padStart(2, '0');
+    return `${hours}:${mins}:00`;
+  };
 
   const handleNewServiceChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setNewService(prev => ({
       ...prev,
-      [name]: name === 'price' || name === 'durationMinutes' ? parseFloat(value) || 0 : value
+      [name]: ['price', 'durationMinutes'].includes(name) ? parseFloat(value) || 0 : value
     }));
   };
 
@@ -88,7 +86,7 @@ const ServiceManagement: React.FC = () => {
     if (editingService) {
       setEditingService(prev => (prev ? {
         ...prev,
-        [name]: name === 'price' || name === 'durationMinutes' ? parseFloat(value) || 0 : value
+        [name]: ['price', 'durationMinutes'].includes(name) ? parseFloat(value) || 0 : value
       } : null));
     }
   };
@@ -98,19 +96,21 @@ const ServiceManagement: React.FC = () => {
       setMessage('Los campos nombre, precio (>0) y duración (>0) son obligatorios.');
       return;
     }
+
     setIsLoading(true);
     setMessage(null);
+
     try {
       const payload = {
-        nombre: newService.name,
-        precio: newService.price,
-        tiempo: newService.durationMinutes,
-        // La API /crearServicio no acepta 'description' ni 'imageUrl' según la especificación
-        // Si los aceptara, se añadirían aquí:
-        // descripcion: newService.description,
+        name: newService.name,
+        description: newService.description || 'Sin descripción',
+        url: newService.imageUrl || `https://placehold.co/180x120/fdebf2/1a2a4d?text=${encodeURIComponent(newService.name)}`,
+        price: newService.price,
+        duration: minutesToDurationString(newService.durationMinutes),
+        idCategory: 1 // o permitir que el usuario lo seleccione
       };
 
-      const response = await fetch(`${API_BASE_URL}/crearServicio`, {
+      const response = await fetch(`${API_BASE_URL}/services`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -119,14 +119,11 @@ const ServiceManagement: React.FC = () => {
       });
 
       if (!response.ok) {
-        // Intentar leer el cuerpo del error si lo hay
         const errorData = await response.json().catch(() => null);
         throw new Error(errorData?.message || `Error al añadir servicio: ${response.statusText}`);
       }
-      
-      // La API no especifica que devuelva el servicio creado.
-      // Así que volvemos a cargar todos los servicios para ver el nuevo.
-      await fetchServices(); 
+
+      await fetchServices();
       setNewService({ name: '', description: '', price: 0, durationMinutes: 0, imageUrl: '' });
       setMessage('Servicio añadido con éxito.');
 
@@ -143,48 +140,47 @@ const ServiceManagement: React.FC = () => {
   };
 
   const handleSaveEdit = async () => {
-    if (editingService) {
-      if (!editingService.name || !editingService.description || editingService.price <= 0 || editingService.durationMinutes <= 0) {
-        setMessage('Todos los campos (nombre, descripción, precio, duración) son obligatorios y deben ser válidos.');
-        return;
-      }
-      
-      // TODO: Implementar llamada a la API para actualizar el servicio.
-      // Se necesitaría un endpoint como PUT /servicio/{id} o /actualizarServicio/{id}
-      // Por ahora, solo actualiza el estado local.
-      console.warn("La funcionalidad de guardar edición solo actualiza el estado local. Falta endpoint API de actualización.");
-      
-      // Simulación de guardado local (esto se reemplazaría con la llamada API y luego fetchServices o actualización local con respuesta)
-      setServices(prev =>
-        prev.map(serv =>
-          serv.id === editingService.id ? editingService : serv
-        )
-      );
+    if (!editingService) return;
+
+    if (
+      !editingService.name ||
+      !editingService.description ||
+      editingService.price <= 0 ||
+      editingService.durationMinutes <= 0
+    ) {
+      setMessage('Todos los campos (nombre, descripción, precio, duración) son obligatorios y deben ser válidos.');
+      return;
+    }
+
+    setIsLoading(true);
+    setMessage(null);
+
+    try {
+      const payload = {
+        name: editingService.name,
+        description: editingService.description,
+        url: editingService.imageUrl || `https://placehold.co/180x120/fdebf2/1a2a4d?text=${encodeURIComponent(editingService.name)}`,
+        price: editingService.price,
+        duration: minutesToDurationString(editingService.durationMinutes),
+        idCategory: 1 // o el valor seleccionado por el usuario
+      };
+
+      const response = await fetch(`${API_BASE_URL}/services/${editingService.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) throw new Error('Error al actualizar servicio');
+
+      await fetchServices();
       setEditingService(null);
-      // Si la API actualiza y devuelve el objeto actualizado, o simplemente confirma:
-      setIsLoading(true);
-      try {
-        const payload = {
-          nombre: editingService.name,
-          precio: editingService.price,
-          tiempo: editingService.durationMinutes,
-          // descripcion: editingService.description, // si la API lo permite
-          // imageUrl: editingService.imageUrl, // si la API lo permite
-        };
-        const response = await fetch(`${API_BASE_URL}/actualizarServicio/${editingService.id}`, { // Endpoint hipotético
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (!response.ok) throw new Error('Error al actualizar servicio');
-        await fetchServices(); // O actualizar localmente si la API devuelve el objeto
-        setEditingService(null);
-        setMessage('Cambios guardados con éxito.');
-      } catch (error) {
-        setMessage(error instanceof Error ? error.message : 'Error al guardar cambios.');
-      } finally {
-        setIsLoading(false);
-      }
+      setMessage('Cambios guardados con éxito.');
+    } catch (error) {
+      console.error("Error updating service:", error);
+      setMessage(error instanceof Error ? error.message : 'Error al guardar cambios.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -194,53 +190,30 @@ const ServiceManagement: React.FC = () => {
   };
 
   const handleDeleteService = async (id: string) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este servicio?')) {
-      setIsLoading(true);
-      setMessage(null);
-      try {
-        const response = await fetch(`${API_BASE_URL}/deleteServicio/${id}`, {
-          method: 'DELETE',
-        });
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => null);
-          throw new Error(errorData?.message || `Error al eliminar servicio: ${response.statusText}`);
-        }
-        // Eliminar del estado local o volver a cargar
-        // setServices(prev => prev.filter(serv => serv.id !== id));
-        await fetchServices(); // Más seguro para reflejar el estado real del backend
-        setMessage('Servicio eliminado con éxito.');
-      } catch (error) {
-        console.error("Error deleting service:", error);
-        setMessage(error instanceof Error ? error.message : 'Error desconocido al eliminar el servicio.');
-      } finally {
-        setIsLoading(false);
+    if (!window.confirm('¿Estás seguro de que quieres eliminar este servicio?')) return;
+
+    setIsLoading(true);
+    setMessage(null);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/services/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.message || `Error al eliminar servicio: ${response.statusText}`);
       }
+
+      await fetchServices();
+      setMessage('Servicio eliminado con éxito.');
+    } catch (error) {
+      console.error("Error deleting service:", error);
+      setMessage(error instanceof Error ? error.message : 'Error desconocido al eliminar el servicio.');
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  {/* const loadedServices: Service[] = [
-      // Servicios Individuales - Masajes
-      { id: 'service-1', name: "Masaje Anti-stress", description: "Masaje relajante para liberar tensiones.", price: 12000, durationMinutes: 50, imageUrl: "/mds/images/services/massage-3795693_1280.jpg" },
-      { id: 'service-2', name: "Masaje Descontracturante", description: "Alivia nudos y tensiones musculares profundas.", price: 13000, durationMinutes: 60, imageUrl: "/mds/images/services/massage-2768832_1280.jpg" },
-      { id: 'service-3', name: "Masaje con Piedras Calientes", description: "Terapia relajante con piedras volcánicas calientes.", price: 15000, durationMinutes: 70, imageUrl: "/mds/images/services/m_116_1677502402.jpg" },
-      { id: 'service-4', name: "Masaje Circulatorio", description: "Mejora la circulación y reduce la retención de líquidos.", price: 11000, durationMinutes: 45, imageUrl: "/mds/images/services/people-3184615_1280.jpg" },
-
-      // Servicios Individuales - Belleza
-      { id: 'service-5', name: "Lifting de Pestaña", description: "Realza tus pestañas de forma natural y duradera.", price: 8500, durationMinutes: 50, imageUrl: "/mds/images/services/woman-567021_1280.jpg" },
-      { id: 'service-6', name: "Depilación Facial", description: "Eliminación de vello facial con métodos suaves.", price: 4000, durationMinutes: 25, imageUrl: "/mds/images/services/beautiful-young-woman-facial-treatment-beauty-salon-applying-cream_219728-3075.avif" },
-      { id: 'service-7', name: "Belleza de Manos y Pies", description: "Manicura y pedicura completas para un cuidado total.", price: 10000, durationMinutes: 90, imageUrl: "/mds/images/services/physical-therapy-2133286_1280.jpg" },
-
-      // Servicios Individuales - Tratamientos Faciales
-      { id: 'service-8', name: "Punta de Diamante Microexfoliación", description: "Exfoliación profunda para renovar la piel del rostro.", price: 9500, durationMinutes: 60, imageUrl: "/mds/images/services/831TreatmentShoot_Derma_0204.jpg" },
-      { id: 'service-9', name: "Limpieza Profunda + Hidratación", description: "Elimina impurezas y nutre la piel del rostro.", price: 11000, durationMinutes: 70, imageUrl: "/mds/images/services/face-2722810_1280.jpg" },
-      { id: 'service-10', name: "Crio Frecuencia Facial", description: "Reafirma y revitaliza la piel con frío y calor controlado.", price: 9000, durationMinutes: 40, imageUrl: "/mds/images/services/conoce-todo-sobre-la-radio-frecuencia-facial.jpg" },
-
-      // Servicios Individuales - Tratamientos Corporales
-      { id: 'service-11', name: "VelaSlim", description: "Tratamiento para reducir celulitis y modelar el cuerpo.", price: 10500, durationMinutes: 45, imageUrl: "/mds/images/services/facial-8224799_1280.jpg" },
-      { id: 'service-12', name: "DermoHealth", description: "Mejora la elasticidad de la piel y reduce la flacidez.", price: 9000, durationMinutes: 40, imageUrl: "/mds/images/services/ai-generated-8270432_1280.jpg" },
-      { id: 'service-13', name: "Criofrecuencia Corporal", description: "Tratamiento reafirmante y reductor de grasa corporal.", price: 12000, durationMinutes: 60, imageUrl: "https://placehold.co/180x120/fdebf2/1a2a4d?text=Criofrecuencia+Corporal" },
-      { id: 'service-14', name: "Ultracavitación", description: "Reduce la grasa localizada mediante ultrasonidos.", price: 11500, durationMinutes: 50, imageUrl: "https://placehold.co/180x120/fdebf2/1a2a4d?text=Ultracavitacion" },
-    ]; */}
 
   return (
     <div className={styles.serviceManagementContainer}>
@@ -284,7 +257,7 @@ const ServiceManagement: React.FC = () => {
           <input
             type="text"
             name="imageUrl"
-            placeholder="URL de Imagen (opcional, local)"
+            placeholder="URL de Imagen"
             value={newService.imageUrl || ''}
             onChange={handleNewServiceChange}
             className={styles.inputField}
@@ -292,7 +265,7 @@ const ServiceManagement: React.FC = () => {
           />
           <textarea
             name="description"
-            placeholder="Descripción del Servicio (local)"
+            placeholder="Descripción del Servicio"
             value={newService.description}
             onChange={handleNewServiceChange}
             className={styles.textareaField}
@@ -373,33 +346,33 @@ const ServiceManagement: React.FC = () => {
                   // Modo visualización
                   <div className={styles.serviceDetails}>
                     {service.imageUrl && (
-                      <img 
-                        src={service.imageUrl} 
-                        alt={service.name} 
-                        className={styles.serviceImage} 
+                      <img
+                        src={service.imageUrl}
+                        alt={service.name}
+                        className={styles.serviceImage}
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
-                          target.onerror = null; 
+                          target.onerror = null;
                           target.src = `https://placehold.co/100x70/f0f0f0/666666?text=No+Image`;
-                        }} 
+                        }}
                       />
                     )}
                     <div className={styles.infoText}>
-                        <p><strong>Nombre:</strong> {service.name}</p>
-                        <p><strong>Descripción:</strong> {service.description}</p>
-                        <p><strong>Precio:</strong> ${service.price.toLocaleString('es-AR')}</p>
-                        <p><strong>Duración:</strong> {service.durationMinutes} minutos</p>
+                      <p><strong>Nombre:</strong> {service.name}</p>
+                      <p><strong>Descripción:</strong> {service.description}</p>
+                      <p><strong>Precio:</strong> ${service.price.toLocaleString('es-AR')}</p>
+                      <p><strong>Duración:</strong> {service.durationMinutes} minutos</p>
                     </div>
                     <div className={styles.actions}>
-                      <button 
-                        onClick={() => handleEditClick(service)} 
+                      <button
+                        onClick={() => handleEditClick(service)}
                         className={`${styles.actionButton} ${styles.editButton}`}
                         disabled={isLoading || !!editingService} // Deshabilitar si ya se está editando otro o cargando
                       >
                         <FaEdit /> Editar
                       </button>
-                      <button 
-                        onClick={() => handleDeleteService(service.id)} 
+                      <button
+                        onClick={() => handleDeleteService(service.id)}
                         className={`${styles.actionButton} ${styles.deleteButton}`}
                         disabled={isLoading || !!editingService} // Deshabilitar si se está editando o cargando
                       >

@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import styles from './ProfessionalManagement.module.css';
 import { FaPlus, FaEdit, FaTrash, FaSave, FaTimes } from 'react-icons/fa';
 
-// Interfaz para un Profesional (Frontend)
 interface Professional {
   id: string;
   name: string;
@@ -11,16 +10,16 @@ interface Professional {
   phone: string;
 }
 
-// Interfaz para el objeto usuario que devuelve la API (ej. /listarUser)
-interface ApiUser {
-  id: string | number;
-  name: string;
+interface ApiPerson {
+  personId: number;
+  firstName: string;
+  lastName: string;
   email: string;
-  phone: string;
-  rol: string;
+  phoneNumber: string;
+  Roles?: { name: string }[];
 }
 
-const API_BASE_URL = 'https://web-spa-hjzu.onrender.com';
+const API_BASE_URL = "https://backend-ecommerce-50vz.onrender.com";
 
 const ProfessionalManagement: React.FC = () => {
   const [professionals, setProfessionals] = useState<Professional[]>([]);
@@ -38,22 +37,20 @@ const ProfessionalManagement: React.FC = () => {
     setIsLoading(true);
     setMessage(null);
     try {
-      const response = await fetch(`${API_BASE_URL}/listarUser`);
+      const response = await fetch(`${API_BASE_URL}/api/persons`);
       if (!response.ok) {
-        throw new Error(`Error al cargar usuarios`);
+        throw new Error(`Error al cargar profesionales`);
       }
-      const apiData: ApiUser[] = await response.json();
-      
-      // Mapear datos de la API a la interfaz del frontend
-      const loadedProfessionals: Professional[] = apiData
-        // Opcional: Filtra para mostrar solo usuarios con un rol específico si la API lo provee
-        // .filter(user => user.rol === 'profesional') 
-        .map(apiUser => ({
-          id: String(apiUser.id),
-          name: apiUser.name || 'Nombre no disponible',
-          email: apiUser.email || 'Correo no disponible',
-          phone: apiUser.phone || 'Teléfono no disponible',
-        }));
+
+      const apiData: any[] = await response.json();
+
+      const loadedProfessionals: Professional[] = apiData.map(person => ({
+        id: String(person.personId),
+        name: `${person.firstName} ${person.lastName}`.trim(),
+        email: person.email || 'Correo no disponible',
+        phone: person.phoneNumber || 'Teléfono no disponible',
+      }));
+
       setProfessionals(loadedProfessionals);
     } catch (error) {
       console.error("Error fetching professionals:", error);
@@ -66,6 +63,7 @@ const ProfessionalManagement: React.FC = () => {
       setIsLoading(false);
     }
   };
+
 
   useEffect(() => {
     fetchProfessionals();
@@ -83,39 +81,59 @@ const ProfessionalManagement: React.FC = () => {
     }
   };
 
-  // --- FUNCIÓN DE AÑADIR PROFESIONAL (IMPLEMENTADA) ---
   const handleAddProfessional = async () => {
-    if (!newProfessional.name 
-      || !newProfessional.email || !newProfessional.phone) {
+    if (!newProfessional.name || !newProfessional.email || !newProfessional.phone) {
       setMessage({ text: 'Todos los campos son obligatorios.', type: 'error' });
       return;
     }
 
     setIsLoading(true);
     setMessage(null);
+
     try {
-      // Ajusta el endpoint y el cuerpo del objeto según tu API
-      const response = await fetch(`${API_BASE_URL}/crearUsuario`, { 
+      const [firstName, ...lastParts] = newProfessional.name.split(' ');
+      const lastName = lastParts.join(' ') || 'Profesional';
+
+      // 1. Crear persona
+      const personResponse = await fetch(`${API_BASE_URL}/persons`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          nombre: newProfessional.name,
+          firstName,
+          lastName,
+          dni: `P-${Date.now()}`, // generado automáticamente
+          email: newProfessional.email,
+          phoneNumber: newProfessional.phone,
           username: newProfessional.email,
-          telefono: newProfessional.phone,
-          // Es posible que necesites enviar un rol, contraseña por defecto, etc.
-          rol: 'PROFESSIONAL',
-          password: 'defaultPassword123' 
+          password: 'defaultPassword123'
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: `Error al añadir profesional` }));
-        throw new Error(errorData.message);
+      if (!personResponse.ok) {
+        const errorData = await personResponse.json().catch(() => null);
+        throw new Error(errorData?.message || 'Error al crear el profesional');
       }
-      
+
+      const createdPerson = await personResponse.json();
+
+      // 2. Asignar rol PROFESSIONAL
+      const roleResponse = await fetch(`${API_BASE_URL}/hasroles`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          idPerson: createdPerson.personId,
+          idRole: 3 // ID real de "PROFESSIONAL", verificá que sea el correcto
+        })
+      });
+
+      if (!roleResponse.ok) {
+        const errorData = await roleResponse.json().catch(() => null);
+        throw new Error(errorData?.message || 'Profesional creado, pero fallo al asignar rol');
+      }
+
       setMessage({ text: 'Profesional añadido con éxito.', type: 'success' });
-      setNewProfessional({ name: '', email: '', phone: '' }); // Limpiar formulario
-      await fetchProfessionals(); // Recargar la lista para mostrar el nuevo profesional
+      setNewProfessional({ name: '', email: '', phone: '' });
+      await fetchProfessionals();
     } catch (error) {
       console.error("Error adding professional:", error);
       setMessage({
@@ -131,81 +149,82 @@ const ProfessionalManagement: React.FC = () => {
     setEditingProfessional({ ...professional });
     setMessage(null);
   };
-
-  // --- LÓGICA DE GUARDAR (ACTUALIZAR) ---
-  // Esta función todavía necesita el endpoint de actualización de tu API
-  const handleSaveEdit = async () => {
-    if (editingProfessional) {
-      if (!editingProfessional.name || !editingProfessional.email || !editingProfessional.phone) {
-        setMessage({ text: 'Todos los campos son obligatorios.', type: 'error' });
-        return;
-      }
-
-      setIsLoading(true);
-      setMessage(null);
-      try {
-         // Reemplaza con tu endpoint real de actualización (PUT o PATCH)
-        const response = await fetch(`${API_BASE_URL}/user/${editingProfessional.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-          nombre: newProfessional.name,
-          username: newProfessional.email,
-          telefono: newProfessional.phone,
-          // Es posible que necesites enviar un rol, contraseña por defecto, etc.
-          rol: 'PROFESSIONAL',
-          password: 'defaultPassword123' 
-        }),
-        });
-        if (!response.ok) throw new Error('Error al guardar los cambios');
-        
-        setMessage({ text: 'Cambios guardados con éxito.', type: 'success' });
-        setEditingProfessional(null);
-        await fetchProfessionals(); // Recargar la lista
-      } catch (error) {
-        setMessage({
-          text: error instanceof Error ? error.message : 'Error al guardar los cambios.',
-          type: 'error'
-        });
-      } finally {
-        setIsLoading(false);
-      }
+// --- LÓGICA DE GUARDAR (ACTUALIZAR) ---
+const handleSaveEdit = async () => {
+  if (editingProfessional) {
+    if (!editingProfessional.name || !editingProfessional.email || !editingProfessional.phone) {
+      setMessage({ text: 'Todos los campos son obligatorios.', type: 'error' });
+      return;
     }
-  };
 
-  const handleCancelEdit = () => {
-    setEditingProfessional(null);
+    setIsLoading(true);
     setMessage(null);
-  };
+    try {
+      const [firstName, ...lastParts] = editingProfessional.name.split(' ');
+      const lastName = lastParts.join(' ') || 'Profesional';
 
-  // --- FUNCIÓN DE ELIMINAR PROFESIONAL (IMPLEMENTADA) ---
-  const handleDeleteProfessional = async (id: string) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar a este profesional? Esta acción no se puede deshacer.')) {
-      setIsLoading(true);
-      setMessage(null);
-      try {
-        const response = await fetch(`${API_BASE_URL}/deleteUser/${id}`, {
-          method: 'DELETE',
-        });
-        
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ message: `Error al eliminar` }));
-          throw new Error(errorData.message);
-        }
+      const response = await fetch(`${API_BASE_URL}/api/persons/${editingProfessional.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email: editingProfessional.email,
+          phoneNumber: editingProfessional.phone,
+          username: editingProfessional.email,
+          // password: 'defaultPassword123' // Si se desea actualizar, opcional
+        }),
+      });
 
-        setMessage({ text: 'Profesional eliminado con éxito.', type: 'success' });
-        await fetchProfessionals(); // Recargar la lista para reflejar la eliminación
-      } catch (error) {
-        console.error("Error deleting professional:", error);
-        setMessage({
-          text: error instanceof Error ? error.message : 'Error desconocido al eliminar el profesional.',
-          type: 'error'
-        });
-      } finally {
-        setIsLoading(false);
-      }
+      if (!response.ok) throw new Error('Error al guardar los cambios');
+
+      setMessage({ text: 'Cambios guardados con éxito.', type: 'success' });
+      setEditingProfessional(null);
+      await fetchProfessionals();
+    } catch (error) {
+      setMessage({
+        text: error instanceof Error ? error.message : 'Error al guardar los cambios.',
+        type: 'error'
+      });
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }
+};
+
+const handleCancelEdit = () => {
+  setEditingProfessional(null);
+  setMessage(null);
+};
+
+// --- FUNCIÓN DE ELIMINAR PROFESIONAL (IMPLEMENTADA) ---
+const handleDeleteProfessional = async (id: string) => {
+  if (window.confirm('¿Estás seguro de que quieres eliminar a este profesional? Esta acción no se puede deshacer.')) {
+    setIsLoading(true);
+    setMessage(null);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/persons/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: `Error al eliminar` }));
+        throw new Error(errorData.message);
+      }
+
+      setMessage({ text: 'Profesional eliminado con éxito.', type: 'success' });
+      await fetchProfessionals();
+    } catch (error) {
+      console.error("Error deleting professional:", error);
+      setMessage({
+        text: error instanceof Error ? error.message : 'Error desconocido al eliminar el profesional.',
+        type: 'error'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+};
 
   // Determina el estilo del mensaje (éxito o error)
   const messageClass = message ? (message.type === 'error' ? styles.errorMessage : styles.successMessage) : '';
@@ -242,7 +261,7 @@ const ProfessionalManagement: React.FC = () => {
       <div className={styles.professionalsListSection}>
         <h2 className={styles.sectionTitle}>Profesionales Existentes</h2>
         {isLoading && professionals.length === 0 && <div className={styles.loading}>Cargando...</div>}
-        
+
         {professionals.length === 0 && !isLoading ? (
           <p>No hay profesionales registrados.</p>
         ) : (
