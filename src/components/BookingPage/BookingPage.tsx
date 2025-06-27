@@ -7,13 +7,13 @@ import 'react-datepicker/dist/react-datepicker.css';
 import DatePicker from 'react-datepicker';
 import { useCart, CartItem } from '../Cart/CartContext';
 
-// Interfaz para un Servicio
+// --- Interfaz para un Servicio (adaptada para la API y el Carrito) ---
 interface Service {
-  id: string;
+  id: string; // El ID de la API (convertido a string)
   name: string;
-  description: string;
-  price: number;
-  durationMinutes: number;
+  description: string; // Aunque no se muestre prominentemente, es bueno tenerlo
+  price: number; // Precio como número
+  durationMinutes: number; // Duración como número de minutos
   imageUrl?: string;
 }
 
@@ -29,7 +29,7 @@ interface ApiService {
   imageUrl?: string;
 }
 
-const API_BASE_URL = 'https://backend-ecommerce-50vz.onrender.com/api';
+const API_BASE_URL = 'https://web-spa-hjzu.onrender.com';
 
 // --- Datos para Profesionales (se mantienen hardcodeados por ahora) ---
 interface ProfessionalData {
@@ -60,32 +60,37 @@ const BookingPage: React.FC = () => {
     const { addToCart } = useCart();
 
     // ===================== Carga de Servicios desde la API =====================
-    const fetchServices = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/services`);
-      if (!response.ok) {
-        throw new Error(`Error al cargar servicios: ${response.statusText}`);
-      }
-      const apiData = await response.json();
+    useEffect(() => {
+        const fetchServicesFromApi = async () => {
+            setIsLoadingServices(true);
+            setStatusMessage(null);
+            try {
+                const response = await fetch(`${API_BASE_URL}/listaServicio`);
+                if (!response.ok) {
+                    throw new Error(`Error al cargar servicios: ${response.statusText}`);
+                }
+                const apiData: ApiService[] = await response.json();
+                
+                const loadedServices: Service[] = apiData.map(apiService => ({
+                    id: String(apiService.id),
+                    name: apiService.nombre,
+                    description: apiService.descripcion || 'Descripción no detallada.', // Valor por defecto
+                    price: apiService.precio,
+                    durationMinutes: apiService.tiempo,
+                    imageUrl: apiService.imageUrl || `https://placehold.co/180x120/fdebf2/1a2a4d?text=${encodeURIComponent(apiService.nombre)}`
+                }));
+                setServices(loadedServices);
+            } catch (error) {
+                console.error("Error fetching services for BookingPage:", error);
+                setStatusMessage({ type: 'error', message: error instanceof Error ? error.message : 'Error al cargar servicios.' });
+                setServices([]);
+            } finally {
+                setIsLoadingServices(false);
+            }
+        };
 
-      const loadedServices: Service[] = apiData.map((item: any) => ({
-        id: String(item.serviceId),
-        name: item.name,
-        description: item.description || 'Sin descripción.',
-        price: parseFloat(item.price),
-        durationMinutes: durationToMinutes(item.duration),
-        imageUrl: item.url || `https://placehold.co/180x120/fdebf2/1a2a4d?text=${encodeURIComponent(item.name)}`
-      }));
-
-      setServices(loadedServices);
-    } catch (error) {
-      console.error("Error fetching services:", error);
-      setMessage(error instanceof Error ? error.message : 'Error desconocido al cargar servicios.');
-      setServices([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        fetchServicesFromApi();
+    }, []); // El array vacío asegura que se ejecute solo al montar el componente
 
 
     // ===================== Funciones Manejadoras de Eventos =====================
