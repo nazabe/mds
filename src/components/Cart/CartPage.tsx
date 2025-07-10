@@ -9,7 +9,7 @@ import styles from './CartPage.module.css'; // Importa el módulo CSS
 import html2canvas from 'html2canvas'; 
 import { jsPDF } from 'jspdf'; 
 
-// Interfaz para los datos que se mostrarán en el PDF
+// Interfaz para los datos que se mostrarán en el PDF (a mejorar)
 interface ReservationDetailsForPdf {
   id: string;
   client: {
